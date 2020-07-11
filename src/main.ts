@@ -4,8 +4,8 @@ import FirstMap from './scenes/FirstMap'
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
-	width: 800,
-	height: 800,
+	width: '100vw',
+	height: '100vh',
 	physics: {
 		default: 'arcade',
 		arcade: {

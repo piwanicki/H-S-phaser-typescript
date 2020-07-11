@@ -1,5 +1,5 @@
 {
-	"name": "HackAndSlashIt",
+	"name": "slashit",
 	"version": "1.0.0",
 	"description": "My first game develop with Typescript + PhaserJs",
 	"scripts": {
