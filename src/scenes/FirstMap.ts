@@ -18,8 +18,8 @@ export default class FirstMap extends Phaser.Scene {
     this.load.image("stone", "assets/images/stone.png");
     this.load.image("hero", "assets/images/hero.png");
     this.load.image("hero_died", "assets/images/hero_died.png");
-    this.load.tilemapTiledJSON("map1", "assets/tilemaps/Map.json");
-    this.load.image("grassPiskel", "assets/tilemaps/grassPiskel.png");
+    this.load.tilemapTiledJSON("map1", "assets/tilemaps/NewMap.json");
+    this.load.image('rougelike','assets/tilemaps/rougelikeMaps/Spritesheet/roguelikeSheet_transparent.png');
   }
 
   create() {
@@ -27,9 +27,10 @@ export default class FirstMap extends Phaser.Scene {
     const height = this.scale.height;
 
     const map = this.make.tilemap({ key: "map1" });
-    const tilesetMap = map.addTilesetImage("grassPiskel", "grassPiskel");
-    const ground = map.createStaticLayer("grass", tilesetMap, 0, 0);
-    ground.setCollision(1);
+    const tilesetMap = map.addTilesetImage('rougelike');
+    const ground = map.createStaticLayer("ground", tilesetMap, 0, 0);
+   
+
 
     this.physics.world.setBounds(0, 0, ground.width, ground.height);
 
@@ -38,14 +39,16 @@ export default class FirstMap extends Phaser.Scene {
     const boundLeft = this.physics.world.bounds.left;
     const boundrRight = this.physics.world.bounds.right;
 
-    // const trees = map.createStaticLayer('trees',tilesetMap,0,0)
+    // trees layer
+    const trees = map.createStaticLayer('trees',tilesetMap,0,0)
+    trees.setCollision(644);
+
 
     this.trees = this.physics.add.staticGroup();
     this.stones = this.physics.add.staticGroup();
 
     this.player = this.physics.add
       .sprite(ground.width * 0.5, ground.height * 0.5, "hero")
-      .setScale(3);
 
     this.player.setCollideWorldBounds(true);
     this.player.body.setBoundsRectangle(
@@ -54,6 +57,7 @@ export default class FirstMap extends Phaser.Scene {
       boundLeft,
       boundrRight
     );
+
 
     //  generate stones
     for (let i = 1; i < 30; i++) {
@@ -88,9 +92,14 @@ export default class FirstMap extends Phaser.Scene {
       this.scale.width * 0.3,
       this.scale.height * 0.3
     );
+    this.cameras.main.setZoom(2.5);
   }
 
   update() {
+
+
+
+
     //moving
     if (this.cursors?.left?.isDown) {
       this.player?.setVelocityX(-750);
