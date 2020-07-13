@@ -10,7 +10,7 @@ export default class FirstMap extends Phaser.Scene {
     player; anims; ground;
 
     constructor() {
-        super("first-map");
+        super("firstMap");
     }
 
     preload() {
@@ -19,7 +19,12 @@ export default class FirstMap extends Phaser.Scene {
         this.load.image("stone", "assets/images/stone.png");
         this.load.tilemapTiledJSON('map1', 'assets/tilemaps/Level1.json');
         this.load.image('dungeonSet', 'assets/tilemaps/DungeonCrawl.png');
-        this.load.image('player', 'assets/images/player/deep_elf_male.png')
+        this.load.spritesheet('player', 'assets/images/player/deep_elf_male.png', {
+            frameWidth: 32,
+            frameHeight: 32,
+            margin: 0,
+            spacing: 0
+        })
     }
 
     create() {
@@ -69,19 +74,19 @@ export default class FirstMap extends Phaser.Scene {
         this.trees = this.physics.add.staticGroup();
         this.stones = this.physics.add.staticGroup();
 
+        //this.player = this.physics.add.sprite(this.ground.width * 0.5, this.ground.height * 0.5, "player").setScale(2);
+
         // spawnPoint in Tiled
         const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
-        //this.player = new Player(this, spawnPoint.x, spawnPoint.y);
+        this.player = new Player(this, 'player', spawnPoint.x, spawnPoint.y);
 
-        //this.player = this.physics.add.sprite(ground.width * 0.5, ground.height * 0.5, "player").setScale(2);
-
-       //this.player.sprite.setCollideWorldBounds(true);
-       //this.player.sprite.body.setBoundsRectangle(
-       //    boundTop,
-       //    boundBottom,
-       //    boundLeft,
-       //    boundrRight
-       //);
+        this.player.sprite.setCollideWorldBounds(true);
+        this.player.sprite.body.setBoundsRectangle(
+            boundTop,
+            boundBottom,
+            boundLeft,
+            boundrRight
+        );
 
         //  generate stones
         for (let i = 1; i < 10; i++) {
@@ -109,15 +114,16 @@ export default class FirstMap extends Phaser.Scene {
 
         }
 
+
         // add collisions
-        this.physics.add.collider(this.trees, this.player);
-        this.physics.add.collider(this.stones, this.player);
+        this.physics.add.collider(this.trees, this.player.sprite);
+        this.physics.add.collider(this.stones, this.player.sprite);
 
         // add keys
         this.cursors = this.input.keyboard.createCursorKeys();
 
         // Camera setting
-        this.cameras.main.startFollow(this.player);
+        this.cameras.main.startFollow(this.player.sprite);
         this.cameras.main.setDeadzone(
             this.scale.width * 0.3,
             this.scale.height * 0.3
@@ -128,7 +134,7 @@ export default class FirstMap extends Phaser.Scene {
         // this.cameras.main.setZoom(2);
 
         this.add
-            .text(this.scale.width * .8, 16,
+            .text(this.scale.width * .7, 16,
                 ['Slashyt demo', 'Use Arrows or WSAD to move'], {
                 font: "18px monospace",
                 fill: "#000000",
@@ -156,53 +162,10 @@ export default class FirstMap extends Phaser.Scene {
         //    this.ground.putTileAtWorldXY(400, worldPoint.x, worldPoint.y);
         //}
 
-        if (menuKeys['E'].isDown) {
+        if (menuKeys.E.isDown) {
             console.log(`switch debug`)
         }
 
-        // // Horizontal movement
-        // if (this.cursors?.left?.isDown) {
-        //     this.player?.setVelocityX(-playerSpeed);
-        // } else if (this.cursors?.right?.isDown) {
-        //     this.player?.setVelocityX(playerSpeed);
-        // }
-
-        // // Vertical movement
-        // else if (this.cursors?.up?.isDown) {
-        //     this.player?.setVelocityY(-playerSpeed);
-        // } else if (this.cursors?.down?.isDown) {
-        //     this.player?.setVelocityY(playerSpeed);
-        // }
-
-        // // additional movement
-        // else if (keys['W'].isDown && keys['A'].isDown) {
-        //     this.player.setVelocityY(-playerSpeed);
-        //     this.player.setVelocityX(-playerSpeed);
-        // }
-        // else if (keys['W'].isDown && keys['D'].isDown) {
-        //     this.player.setVelocityY(-playerSpeed);
-        //     this.player.setVelocityX(playerSpeed);
-
-        // } else if (keys['D'].isDown && keys['S'].isDown) {
-        //     this.player.setVelocityX(playerSpeed);
-        //     this.player.setVelocityY(playerSpeed);
-        // } else if (keys['A'].isDown && keys['S'].isDown) {
-        //     this.player.setVelocityX(-playerSpeed);
-        //     this.player.setVelocityY(playerSpeed);
-        // } else if (keys['W'].isDown) {
-        //     this.player.setVelocityY(-playerSpeed);
-        // } else if (keys['S'].isDown) {
-        //     this.player.setVelocityY(playerSpeed);
-        // } else if (keys['A'].isDown) {
-        //     this.player.setVelocityX(-playerSpeed);
-        // } else if (keys['D'].isDown) {
-        //     this.player?.setVelocityX(playerSpeed);
-        // }
-        // else {
-        //     this.player?.setVelocityX(0);
-        //     this.player?.setVelocityY(0);
-        // }
-        // this.player.body.velocity.normalize().scale(playerSpeed);
 
     }
 }

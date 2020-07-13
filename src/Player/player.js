@@ -6,42 +6,36 @@ import Phaser from "phaser";
 //  * method when you're done with the sprite.
 //  */
 export default class Player {
-  constructor(scene, x, y) {
+  constructor(scene, sprite, x, y) {
     this.scene = scene;
-
-    // Create the animations we need from the sprite spritesheet
-    //const anims = scene.anims;
-    //anims.create({
-    //    key: "misa-left-walk",
-    //    frames: anims.generateFrameNames("atlas", { prefix: "misa-left-walk.", start: 0, end: 3, zeroPad: 3 }),
-    //    frameRate: 10,
-    //    repeat: -1
-    //});
-    //anims.create({
-    //    key: "misa-right-walk",
-    //    frames: anims.generateFrameNames("atlas", { prefix: "misa-right-walk.", start: 0, end: 3, zeroPad: 3 }),
-    //    frameRate: 10,
-    //    repeat: -1
-    //});
-    //anims.create({
-    //    key: "misa-front-walk",
-    //    frames: anims.generateFrameNames("atlas", { prefix: "misa-front-walk.", start: 0, end: 3, zeroPad: 3 }),
-    //    frameRate: 10,
-    //    repeat: -1
-    //});
-    //anims.create({
-    //    key: "misa-back-walk",
-    //    frames: anims.generateFrameNames("atlas", { prefix: "misa-back-walk.", start: 0, end: 3, zeroPad: 3 }),
-    //    frameRate: 10,
-    //    repeat: -1
-    //});
-
-    //     // Create the physics-based sprite that we will move around and animate
     this.sprite = scene.physics.add
-      .sprite(x, y, "player", 0)
+      .sprite(x, y, sprite, 0)
       .setDrag(1000, 0)
       .setMaxVelocity(300, 400)
       .setScale(2);
+
+    // Create the animations we need from the sprite spritesheet
+    const anims = scene.anims;
+    anims.create({
+      key: "player-stand",
+      frames: anims.generateFrameNames("player", {start: 1, end: 3}),
+      frameRate: 2,
+      repeat: -1,
+    });
+    anims.create({
+      key: "player-left-walk",
+      frames: anims.generateFrameNames("player", {start: 5, end: 6}),
+      frameRate: 5,
+      repeat: -1,
+    });
+    anims.create({
+      key: "player-right-walk",
+      frames: anims.generateFrameNames("player", {start: 7, end: 8}),
+      frameRate: 5,
+      repeat: -1,
+    });
+
+    //     // Create the physics-based sprite that we will move around and animate
 
     // Track the arrow keys & WASD
     const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;
@@ -61,58 +55,68 @@ export default class Player {
     const keys = this.keys;
     const sprite = this.sprite;
     const spriteSpeed = 750;
+    const anims = this.anims;
 
     //     // Apply horizontal acceleration when left/a or right/d are applied
     // if (keys.left.isDown || keys.a.isDown) {
-    //   sprite.setAccelerationX(-acceleration);
+    //   sprite.setVelocityX(-acceleration);
     //   // No need to have a separate set of graphics for running to the left & to the right. Instead
     //   // we can just mirror the sprite.
     //   sprite.setFlipX(true);
     // } else if (keys.right.isDown || keys.d.isDown) {
-    //   sprite.setAccelerationX(acceleration);
+    //   sprite.setVelocityX(acceleration);
     //   sprite.setFlipX(false);
     // } else {
-    //   sprite.setAccelerationX(0);
+    //   sprite.setVelocityX(0);
     // }
 
     // Horizontal movement
     if (keys.left.isDown) {
-      sprite.setAccelerationX(-spriteSpeed);
+      sprite.setVelocityX(-spriteSpeed);
+      sprite.anims.play("player-left-walk", true);
     } else if (keys.right.isDown) {
-      sprite.setAccelerationX(spriteSpeed);
+      sprite.setVelocityX(spriteSpeed);
+      sprite.anims.play("player-right-walk", true);
     }
 
     // Vertical movement
     else if (keys.up.isDown) {
-      sprite.setAccelerationY(-spriteSpeed);
+      sprite.setVelocityY(-spriteSpeed);
     } else if (keys.down.isDown) {
-      sprite.setAccelerationY(spriteSpeed);
+      sprite.setVelocityY(spriteSpeed);
     }
 
     // additional movement
     else if (keys.W.isDown && keys.A.isDown) {
-      sprite.setAccelerationY(-spriteSpeed);
-      sprite.setAccelerationX(-spriteSpeed);
+      sprite.setVelocityY(-spriteSpeed);
+      sprite.setVelocityX(-spriteSpeed);
+      sprite.anims.play("player-left-walk", true);
     } else if (keys.W.isDown && keys.D.isDown) {
-      sprite.setAccelerationY(-spriteSpeed);
-      sprite.setAccelerationX(spriteSpeed);
+      sprite.setVelocityY(-spriteSpeed);
+      sprite.setVelocityX(spriteSpeed);
+      sprite.anims.play("player-right-walk", true);
     } else if (keys.D.isDown && keys.S.isDown) {
-      sprite.setAccelerationX(spriteSpeed);
-      sprite.setAccelerationY(spriteSpeed);
+      sprite.setVelocityX(spriteSpeed);
+      sprite.setVelocityY(spriteSpeed);
+      sprite.anims.play("player-right-walk", true);
     } else if (keys.A.isDown && keys.S.isDown) {
-      sprite.setAccelerationX(-spriteSpeed);
-      sprite.setAccelerationY(spriteSpeed);
+      sprite.setVelocityX(-spriteSpeed);
+      sprite.setVelocityY(spriteSpeed);
+      sprite.anims.play("player-left-walk", true);
     } else if (keys.W.isDown) {
-      sprite.setAccelerationY(-spriteSpeed);
+      sprite.setVelocityY(-spriteSpeed);
     } else if (keys.S.isDown) {
-      sprite.setAccelerationY(spriteSpeed);
+      sprite.setVelocityY(spriteSpeed);
     } else if (keys.A.isDown) {
-      sprite.setAccelerationX(-spriteSpeed);
+      sprite.setVelocityX(-spriteSpeed);
+      sprite.anims.play("player-left-walk", true);
     } else if (keys.D.isDown) {
-      sprite.setAccelerationX(spriteSpeed);
+      sprite.setVelocityX(spriteSpeed);
+      sprite.anims.play("player-right-walk", true);
     } else {
-      sprite.setAccelerationX(0);
-      sprite.setAccelerationY(0);
+      sprite.setVelocityX(0);
+      sprite.setVelocityY(0);
+      sprite.anims.play("player-stand", true);
     }
     sprite.body.velocity.normalize().scale(spriteSpeed);
 
