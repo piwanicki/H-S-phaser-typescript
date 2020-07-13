@@ -1,6 +1,5 @@
-import Phaser from 'phaser'
-
-import FirstMap from './scenes/FirstMap'
+import Phaser from 'phaser';
+import FirstMap from './scenes/FirstMap';
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
