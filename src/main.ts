@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import FirstMap from './scenes/FirstMap';
+import DungeonScene from './scenes/dungeon';
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
@@ -12,11 +13,13 @@ const config: Phaser.Types.Core.GameConfig = {
 			debug: true
 		}
 	},
-	scene: [FirstMap],
+	scene: [FirstMap,DungeonScene],
+	//scene: [DungeonScene],
 	scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH 
-    },
+	},
+	
 }
 
 export default new Phaser.Game(config)

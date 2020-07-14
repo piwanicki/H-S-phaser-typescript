@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 import Player from '../Player/player';
-import PlayerCursor from '~/Player/playerCursor';
 
 export default class FirstMap extends Phaser.Scene {
     private background?: Phaser.GameObjects.TileSprite;
@@ -13,8 +12,9 @@ export default class FirstMap extends Phaser.Scene {
     private paths?: Phaser.Tilemaps.StaticTilemapLayer;
     private waterEdges?: Phaser.Physics.Arcade.StaticGroup;
     private layerDebugEnabled = false as Boolean;
-    player; anims; water;
+    player; anims; water; pathsLayer;
     playerCursor;
+    dungEnter;
 
     constructor() {
         super("firstMap");
@@ -103,6 +103,7 @@ export default class FirstMap extends Phaser.Scene {
         this.trees = this.physics.add.staticGroup();
         this.stones = this.physics.add.staticGroup();
         this.waterEdges = this.physics.add.staticGroup();
+        this.pathsLayer = this.physics.add.staticGroup();
 
         // 1217 - 1220
 
@@ -117,6 +118,13 @@ export default class FirstMap extends Phaser.Scene {
             }
             else if (tile.index === 1221) {
                 this.prepareSpriteFromTile(this.water, tile, 'waterEdge-right', 6, 32, 0, 0);
+            }
+        })
+
+        this.paths.forEachTile(tile => {
+            if(tile.index === 2872) {
+                this.dungEnter = tile;
+                console.log(this.dungEnter);
             }
         })
 
@@ -166,6 +174,7 @@ export default class FirstMap extends Phaser.Scene {
         this.physics.add.collider(this.stones, this.player.sprite);
         this.physics.add.collider(this.water, this.player.sprite);
         this.physics.add.collider(this.waterEdges, this.player.sprite);
+        this.physics.add.collider(this.pathsLayer, this.player.sprite);
 
         // add keys
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -179,8 +188,8 @@ export default class FirstMap extends Phaser.Scene {
         // zoom settings
         this.cameras.main.setZoom(2.6);
 
-        this.add
-            .text(this.scale.width * .7, 16,
+        const text = this.add
+            .text(0, 16,
                 ['SlashYt demo', 'Use Arrows or WSAD to move'], {
                 font: "18px monospace",
                 fill: "#000000",
@@ -190,29 +199,38 @@ export default class FirstMap extends Phaser.Scene {
 
             })
             .setScrollFactor(0);
+
+    }
+
+    dungEnterHandler() {
+        this.scene.start('dungeonMap');
+        console.log(`dung enter`)
     }
 
     update(time, delta) {
 
         this.player.update();
-
-
         const menuKeys = this.input.keyboard.addKeys({
             E: 'E',
         });
-
         // Convert the mouse position to world position within the camera
         const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-
         // Draw tiles (only within the groundLayer)
         //if (this.input.manager.activePointer.isDown) {
         //    this.ground?.putTileAtWorldXY(400, worldPoint.x, worldPoint.y);
         //}
-
         if (menuKeys.E.isDown) {
             this.enableDebugGraphics(this.water);
         }
 
+
+        this.physics.add.overlap(
+            this.player.sprite,
+            this.dungEnter,
+            this.dungEnterHandler, // called on overlap
+            undefined,
+            this
+          );
 
     }
 }
