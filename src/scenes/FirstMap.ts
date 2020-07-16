@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import Player from '../Player/player';
+import TILES from './tileMapping';
 
 export default class FirstMap extends Phaser.Scene {
     private background?: Phaser.GameObjects.TileSprite;
@@ -8,13 +9,12 @@ export default class FirstMap extends Phaser.Scene {
     //private player?: Phaser.Physics.Arcade.Sprite;
     private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
     private ground?: Phaser.Tilemaps.DynamicTilemapLayer;
+    private paths?: Phaser.Tilemaps.DynamicTilemapLayer;
     //private water?: Phaser.Tilemaps.StaticTilemapLayer;
-    private paths?: Phaser.Tilemaps.StaticTilemapLayer;
     private waterEdges?: Phaser.Physics.Arcade.StaticGroup;
     private layerDebugEnabled = false as Boolean;
-    player; anims; water; pathsLayer;
-    playerCursor;
-    dungEnter;
+    player; anims; water; enters;
+    playerCursor; playerInDungeon;
 
     constructor() {
         super("firstMap");
@@ -25,7 +25,7 @@ export default class FirstMap extends Phaser.Scene {
         this.load.image("tree2", "assets/images/trees/tree_2_lightred.png");
         this.load.image("stone", "assets/images/stone.png");
         this.load.tilemapTiledJSON('map1', 'assets/tilemaps/Level1.json');
-        this.load.image('dungeonSet', 'assets/tilemaps/DungeonCrawl.png');
+        this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl.png");
         this.load.spritesheet('player', 'assets/images/player/deep_elf_male.png', {
             frameWidth: 32,
             frameHeight: 32,
@@ -67,12 +67,13 @@ export default class FirstMap extends Phaser.Scene {
         const tilesetMap = map.addTilesetImage('dungeonSet');
         this.ground = map.createDynamicLayer("ground", tilesetMap, 0, 0);
         this.water = map.createDynamicLayer('water', tilesetMap, 0, 0);
-        this.paths = map.createStaticLayer('paths', tilesetMap, 0, 0);
+        this.paths = map.createDynamicLayer('paths', tilesetMap, 0, 0);
+        this.enters = map.createStaticLayer('enters', tilesetMap, 0, 0);
+
         // custom property from tiled 
         this.ground.setCollisionByProperty({ collide: true });
         this.water.setCollisionByProperty({ collide: true });
-
-
+        this.paths.setCollisionByProperty({ collide: true });
 
         // Put tile index 1 at tile grid location (20, 10) within layer
         //ground.putTileAt(1, 20, 10);
@@ -103,7 +104,6 @@ export default class FirstMap extends Phaser.Scene {
         this.trees = this.physics.add.staticGroup();
         this.stones = this.physics.add.staticGroup();
         this.waterEdges = this.physics.add.staticGroup();
-        this.pathsLayer = this.physics.add.staticGroup();
 
         // 1217 - 1220
 
@@ -118,13 +118,6 @@ export default class FirstMap extends Phaser.Scene {
             }
             else if (tile.index === 1221) {
                 this.prepareSpriteFromTile(this.water, tile, 'waterEdge-right', 6, 32, 0, 0);
-            }
-        })
-
-        this.paths.forEachTile(tile => {
-            if(tile.index === 2872) {
-                this.dungEnter = tile;
-                console.log(this.dungEnter);
             }
         })
 
@@ -170,23 +163,25 @@ export default class FirstMap extends Phaser.Scene {
 
 
         // add collisions
-        //this.physics.add.collider(this.trees, this.player.sprite);
+        this.physics.add.collider(this.trees, this.player.sprite);
         this.physics.add.collider(this.stones, this.player.sprite);
         this.physics.add.collider(this.water, this.player.sprite);
         this.physics.add.collider(this.waterEdges, this.player.sprite);
-        this.physics.add.collider(this.pathsLayer, this.player.sprite);
+        this.physics.add.collider(this.paths, this.player.sprite);
+        this.physics.add.collider(this.enters, this.player.sprite);
 
         // add keys
         this.cursors = this.input.keyboard.createCursorKeys();
 
         // Camera setting
-        this.cameras.main.startFollow(this.player.sprite);
-        this.cameras.main.setDeadzone(175, 75)
+        const camera = this.cameras.main;
+        camera.startFollow(this.player.sprite);
+        camera.setDeadzone(175, 75)
 
 
-        this.cameras.main.setBounds(0, 0, this.ground?.width, this.ground?.height);
+        camera.setBounds(0, 0, this.ground?.width, this.ground?.height);
         // zoom settings
-        this.cameras.main.setZoom(2.6);
+        camera.setZoom(2.6);
 
         const text = this.add
             .text(0, 16,
@@ -196,18 +191,38 @@ export default class FirstMap extends Phaser.Scene {
                 padding: { x: 20, y: 10 },
                 backgroundColor: "#ffffff",
                 align: "center",
-
             })
             .setScrollFactor(0);
 
-    }
+        // add tileIndex callback
+        this.enters.setTileIndexCallback(TILES.DUNG_ENTER, () => {
+            console.log(`dung enter`);
+            this.enters.setTileIndexCallback(TILES.DUNG_ENTER, null);
+            this.player.freeze();
+            camera.fade(250, 0, 0, 0);
+            camera.once('camerafadeoutcomplete', () => {
+                this.player.destroy();
+                this.scene.start('dungeonMap');
+                this.playerInDungeon = true;
 
-    dungEnterHandler() {
-        this.scene.start('dungeonMap');
-        console.log(`dung enter`)
+            });
+        })
+        // add tileIndex callback
+        this.enters.setTileIndexCallback(TILES.DUNG_ENTER2, () => {
+            console.log(`dung enter2`);
+            this.enters.setTileIndexCallback(TILES.DUNG_ENTER, null);
+            this.player.freeze();
+            camera.fade(250, 0, 0, 0);
+            camera.once('camerafadeoutcomplete', () => {
+                this.player.destroy();
+                this.scene.start('dungeonMap');
+                this.playerInDungeon = true;
+            });
+        })
     }
 
     update(time, delta) {
+        if (this.playerInDungeon) return;
 
         this.player.update();
         const menuKeys = this.input.keyboard.addKeys({
@@ -224,13 +239,6 @@ export default class FirstMap extends Phaser.Scene {
         }
 
 
-        this.physics.add.overlap(
-            this.player.sprite,
-            this.dungEnter,
-            this.dungEnterHandler, // called on overlap
-            undefined,
-            this
-          );
 
     }
 }

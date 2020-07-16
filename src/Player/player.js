@@ -66,6 +66,10 @@ export default class Player {
     // this.graphics.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);
   }
 
+  freeze() {
+    this.sprite.body.moves = false;
+  }
+
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
@@ -88,6 +92,10 @@ export default class Player {
     if (this.scene.input.activePointer.isDown) {
       this.attackHandler();
     }
+
+    sprite.setVelocityX(0);
+    sprite.setVelocityY(0);
+    sprite.anims.play("player-stand", true);
 
     // Horizontal movement
     if (keys.left.isDown) {
@@ -132,10 +140,6 @@ export default class Player {
     } else if (keys.D.isDown) {
       sprite.setVelocityX(spriteSpeed);
       sprite.anims.play("player-right-walk", true);
-    } else {
-      sprite.setVelocityX(0);
-      sprite.setVelocityY(0);
-      sprite.anims.play("player-stand", true);
     }
     sprite.body.velocity.normalize().scale(spriteSpeed);
 
