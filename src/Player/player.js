@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import PlayerCursor from "./playerCursor";
+import createPlayerAnims from "../anims/player-anims";
 
 // /**
 //  * A class that wraps up our 2D platforming sprite logic. It creates, animates and moves a sprite in
@@ -18,27 +19,6 @@ export default class Player {
     this.map = map;
     this.inventory = {};
 
-    // Create the animations we need from the sprite spritesheet
-    const anims = scene.anims;
-    anims.create({
-      key: "player-stand",
-      frames: anims.generateFrameNames("player", {start: 1, end: 3}),
-      frameRate: 2,
-      repeat: -1,
-    });
-    anims.create({
-      key: "player-left-walk",
-      frames: anims.generateFrameNames("player", {start: 5, end: 6}),
-      frameRate: 5,
-      repeat: -1,
-    });
-    anims.create({
-      key: "player-right-walk",
-      frames: anims.generateFrameNames("player", {start: 7, end: 8}),
-      frameRate: 5,
-      repeat: -1,
-    });
-
     // Track the arrow keys & WASD
     const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;
     this.keys = scene.input.keyboard.addKeys({
@@ -53,12 +33,14 @@ export default class Player {
     });
   }
 
+  //create() {
+  //  createPlayerAnims(this.anims);
+  //}
+
   attackHandler() {
     const pointer = this.scene.input.activePointer;
     const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
-    console.log(worldPoint);
     const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
-    console.log(pointerTileXY);
     // const snappedWorldPoint = this.map.tileToWorldXY(
     //   pointerTileXY.x,
     //   pointerTileXY.y
@@ -74,7 +56,7 @@ export default class Player {
     const keys = this.keys;
     const sprite = this.sprite;
     const spriteSpeed = 750;
-    const anims = this.anims;
+    //const anims = this.anims;
     //this.playerCursor.update();
 
     //     // Apply horizontal acceleration when left/a or right/d are applied
@@ -92,10 +74,6 @@ export default class Player {
     if (this.scene.input.activePointer.isDown) {
       this.attackHandler();
     }
-
-    sprite.setVelocityX(0);
-    sprite.setVelocityY(0);
-    sprite.anims.play("player-stand", true);
 
     // Horizontal movement
     if (keys.left.isDown) {
@@ -140,6 +118,10 @@ export default class Player {
     } else if (keys.D.isDown) {
       sprite.setVelocityX(spriteSpeed);
       sprite.anims.play("player-right-walk", true);
+    } else {
+      sprite.setVelocityX(0);
+      sprite.setVelocityY(0);
+      sprite.anims.play("player-stand", true);
     }
     sprite.body.velocity.normalize().scale(spriteSpeed);
 

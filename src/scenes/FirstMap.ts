@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import Player from '../Player/player';
 import TILES from './tileMapping';
+import createPlayerAnims from '../anims/player-anims';
+import createTentacleAnims from '~/anims/tentacle-anims';
 
 export default class FirstMap extends Phaser.Scene {
     private background?: Phaser.GameObjects.TileSprite;
@@ -62,6 +64,10 @@ export default class FirstMap extends Phaser.Scene {
     create() {
         const width = this.scale.width;
         const height = this.scale.height;
+        this.playerInDungeon = false;
+        createPlayerAnims(this.anims);
+        createTentacleAnims(this.anims);
+
 
         const map = this.make.tilemap({ key: "map1" });
         const tilesetMap = map.addTilesetImage('dungeonSet');

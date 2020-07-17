@@ -3,6 +3,9 @@ import Dungeon from "@mikewesthad/dungeon";
 import Player from "../Player/player";
 import TILES from "./tileMapping";
 import TilemapVisibility from "./tilemapVisibility";
+import Tentacle from "~/enemies/tentacle";
+import createTentacleAnims from "../anims/tentacle-anims";
+import createPlayerAnims from "../anims/player-anims";
 
 export default class DungeonScene extends Phaser.Scene {
   constructor() {
@@ -16,8 +19,12 @@ export default class DungeonScene extends Phaser.Scene {
   groundLayer;
   wallsLayer;
   stuffLayer;
+  enemiesLayer;
   tilemapVisibility;
   levelComplete;
+  backToSurface;
+  tentacles;
+  enemies;
 
   preload() {
     this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl.png");
@@ -29,11 +36,38 @@ export default class DungeonScene extends Phaser.Scene {
       margin: 0,
       spacing: 0,
     });
+    this.load.spritesheet("tentacle", "assets/images/enemies/tentacle.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+      margin: 0,
+      spacing: 0,
+    });
+  }
+
+  addEnemyInRoom(x, y, sprite) {
+    const enemy = this.enemies.get(x, y, sprite);
+    console.log(enemy);
+
+    // set active and visible
+    enemy.setActive(true);
+    enemy.setVisible(true);
+    //
+    this.add.existing(enemy);
+    //// update the physics body size
+    this.physics.world.enable(enemy);
+
+    enemy.body.setSize(enemy.width, enemy.height);
+    console.log(sprite);
+    return enemy;
   }
 
   create() {
     this.level++;
     this.levelComplete = false;
+    this.backToSurface = false;
+    createPlayerAnims(this.anims);
+    createTentacleAnims(this.anims);
+
     // Generate a random world
     this.dungeon = new Dungeon({
       width: 50,
@@ -70,12 +104,6 @@ export default class DungeonScene extends Phaser.Scene {
 
     const tilesetStuff = map.addTilesetImage("dungeonSet", null, 32, 32, 0, 0);
     this.stuffLayer = map.createBlankDynamicLayer("stuffLayer", tilesetStuff);
-
-    const shadowLayer = map
-      .createBlankDynamicLayer("shadow", dungeonTileset)
-      .fill(TILES.BLANK);
-    console.log(shadowLayer);
-    this.tilemapVisibility = new TilemapVisibility(shadowLayer);
 
     this.dungeon.rooms.forEach((room) => {
       // destructuring
@@ -159,7 +187,7 @@ export default class DungeonScene extends Phaser.Scene {
     const axe = "axe.cur";
     const playerRoom = startRoom;
     const playerX = map.tileToWorldX(playerRoom.centerX);
-    const playerY = map.tileToWorldX(playerRoom.centerY);
+    const playerY = map.tileToWorldY(playerRoom.centerY);
     this.player = new Player(this, "player", playerX, playerY, axe, map);
     this.stuffLayer.putTileAt(
       TILES.STAIRS_UP,
@@ -167,27 +195,79 @@ export default class DungeonScene extends Phaser.Scene {
       this.player.sprite.y
     );
 
+    this.enemiesLayer = map.createBlankDynamicLayer(
+      "enemies",
+      tilesetStuff,
+      0,
+      0
+    );
+
+    this.enemies = this.physics.add.group({
+      classType: Tentacle,
+      createCallback: (gameObj) => {
+        const tentacleObj = gameObj;
+        tentacleObj.body.onCollide = true;
+      },
+    });
+
+    this.enemies.get(
+      this.player.sprite.x,
+      this.player.sprite.y + 50,
+      "tentacle"
+    );
+
     // Place stuffLayer in the 90% "otherRooms"
     otherRooms.forEach((room) => {
       const rand = Math.random();
+      const roomCenterOnWorldMap = map.tileToWorldXY(
+        room.centerX,
+        room.centerY
+      );
+
       if (rand <= 0.05) {
         // 5% chance of chest
         this.stuffLayer.putTileAt(TILES.HP, room.centerX, room.centerY);
         console.log(`hp`);
+        this.enemies.create(
+          "tentacle",
+          roomCenterOnWorldMap.x,
+          roomCenterOnWorldMap.y
+        );
+        this.addEnemyInRoom(
+          roomCenterOnWorldMap.x,
+          roomCenterOnWorldMap.y,
+          "tentacle"
+        );
       } else if (rand <= 0.1) {
         // 10% chance of Mana
         this.stuffLayer.putTileAt(TILES.MANA, room.centerX, room.centerY);
+
+        this.addEnemyInRoom(
+          roomCenterOnWorldMap.x + 10,
+          roomCenterOnWorldMap.y + 50,
+          "tentacle"
+        );
         console.log(`mana`);
       } else if (rand <= 0.25) {
         // 25% chance of chest
         this.stuffLayer.putTileAt(TILES.CHEST, room.centerX, room.centerY);
         console.log(`chest`);
+        this.addEnemyInRoom(
+          roomCenterOnWorldMap.x + 30,
+          roomCenterOnWorldMap.y - 60,
+          "tentacle"
+        );
       } else if (rand <= 0.5) {
         // 50% chance of a pot anywhere in the room... except don't block a door!
         const x = Phaser.Math.Between(room.left + 2, room.right - 2);
         const y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
         this.stuffLayer.putTileAt(TILES.PENTAGRAM, x, y);
         console.log(`tower`);
+        this.addEnemyInRoom(
+          roomCenterOnWorldMap.x,
+          roomCenterOnWorldMap.y,
+          "tentacle"
+        );
       } else {
         // 25% of either 2 or 4 towers, depending on the room size
         if (room.height >= 9) {
@@ -212,6 +292,11 @@ export default class DungeonScene extends Phaser.Scene {
             room.centerX + 1,
             room.centerY + 1
           );
+          this.addEnemyInRoom(
+            roomCenterOnWorldMap.x,
+            roomCenterOnWorldMap.y,
+            "tentacle"
+          );
         } else {
           this.stuffLayer.putTileAt(
             TILES.STATUE_1,
@@ -223,6 +308,11 @@ export default class DungeonScene extends Phaser.Scene {
             room.centerX + 1,
             room.centerY - 1
           );
+          this.addEnemyInRoom(
+            roomCenterOnWorldMap.x,
+            roomCenterOnWorldMap.y,
+            "tentacle"
+          );
         }
       }
     });
@@ -230,12 +320,15 @@ export default class DungeonScene extends Phaser.Scene {
     // Watch the player and layer for collisions, for the duration of the scene:
     this.physics.add.collider(this.player.sprite, this.wallsLayer);
     this.physics.add.collider(this.player.sprite, this.stuffLayer);
+    this.physics.add.collider(this.player.sprite, this.enemies);
+    this.physics.add.collider(this.wallsLayer, this.enemies);
+    this.physics.add.collider(this.stuffLayer, this.enemies);
 
     // Phaser supports multiple cameras, but you can access the default camera like this:
     const camera = this.cameras.main;
     camera.startFollow(this.player.sprite);
     camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    camera.setZoom(2.3);
+    //camera.setZoom(2.3);
 
     // Help text that has a "fixed" position on the screen
     this.add
@@ -249,20 +342,46 @@ export default class DungeonScene extends Phaser.Scene {
 
     // add tileIndex callback
     this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, () => {
-      console.log(`enter next level`);
       this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
       this.levelComplete = true;
-      //this.player.freeze();
+      this.player.freeze();
       camera.fade(250, 0, 0, 0);
       camera.once("camerafadeoutcomplete", () => {
         this.player.destroy();
         this.scene.restart();
       });
     });
+
+    this.stuffLayer.setTileIndexCallback(TILES.STAIRS_UP, () => {
+      if (this.level === 1) {
+        this.backToSurface = true;
+        this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
+        this.player.freeze();
+        camera.fade(250, 0, 0, 0);
+        camera.once("camerafadeoutcomplete", () => {
+          this.player.destroy();
+          this.scene.start("firstMap");
+        });
+      } else {
+        this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
+        this.levelComplete = true;
+        this.player.freeze();
+        camera.fade(250, 0, 0, 0);
+        camera.once("camerafadeoutcomplete", () => {
+          this.player.destroy();
+          this.scene.restart();
+        });
+      }
+    });
+    const shadowLayer = map
+      .createBlankDynamicLayer("shadow", dungeonTileset)
+      .fill(TILES.BLANK);
+
+    this.tilemapVisibility = new TilemapVisibility(shadowLayer);
   }
 
   update(time, delta) {
-    if (this.levelComplete) return;
+    if (this.levelComplete || this.backToSurface) return;
     this.player.update();
 
     // Find the player's room using another helper method from the dungeon that converts from dungeon XY (in grid units) to the corresponding room instance

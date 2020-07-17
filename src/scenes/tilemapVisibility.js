@@ -13,7 +13,7 @@ export default class TilemapVisibility {
     }
   }
 
-  // set alpha for all tiles 
+  // set alpha for all tiles
   setRoomAlpha(room, alpha) {
     this.shadowLayer.forEachTile(
       (tile) => (tile.alpha = alpha),
