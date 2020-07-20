@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import Player from '../Player/player';
 import TILES from './tileMapping';
 import createPlayerAnims from '../anims/player-anims';
-import createTentacleAnims from '~/anims/tentacle-anims';
+import StatusBar from '../statusBar/statusBar';
 
 export default class FirstMap extends Phaser.Scene {
     private background?: Phaser.GameObjects.TileSprite;
@@ -17,7 +17,9 @@ export default class FirstMap extends Phaser.Scene {
     private layerDebugEnabled = false as Boolean;
     player; anims; water; enters;
     playerCursor; playerInDungeon;
-
+    statusBar;
+    missile;
+    fireCld = false;
     constructor() {
         super("firstMap");
     }
@@ -38,6 +40,8 @@ export default class FirstMap extends Phaser.Scene {
         this.load.image('waterEdge-right', 'assets/images/waters/deep_water_wave_west.png')
         this.load.image('waterEdge-up', 'assets/images/waters/deep_water_wave_north.png')
         this.load.image('waterEdge-down', 'assets/images/waters/deep_water_wave_south.png')
+        this.load.image('statusBar', 'assets/images/statusBar.png');
+        this.load.image('arrowMissile', 'assets/images/player/arrow_0.png');
 
     }
 
@@ -62,12 +66,13 @@ export default class FirstMap extends Phaser.Scene {
     }
 
     create() {
+
+
+
         const width = this.scale.width;
         const height = this.scale.height;
         this.playerInDungeon = false;
         createPlayerAnims(this.anims);
-        createTentacleAnims(this.anims);
-
 
         const map = this.make.tilemap({ key: "map1" });
         const tilesetMap = map.addTilesetImage('dungeonSet');
@@ -142,6 +147,10 @@ export default class FirstMap extends Phaser.Scene {
             boundrRight
         );
 
+
+
+        //wthis.missile = this.physics.add.sprite(this.player.sprite.body.center.x, this.player.sprite.body.center.y, 'arrowMissile').setScale(0.6).setVisible(false);
+
         //  generate stones
         for (let i = 1; i < 15; i++) {
             const stone = this.stones.create(
@@ -164,9 +173,7 @@ export default class FirstMap extends Phaser.Scene {
 
             tree1.setScale(2).refreshBody();
             tree2.setScale(2).refreshBody();
-
         }
-
 
         // add collisions
         this.physics.add.collider(this.trees, this.player.sprite);
@@ -187,7 +194,7 @@ export default class FirstMap extends Phaser.Scene {
 
         camera.setBounds(0, 0, this.ground?.width, this.ground?.height);
         // zoom settings
-        camera.setZoom(2.6);
+        camera.setZoom(2);
 
         const text = this.add
             .text(0, 16,
@@ -210,7 +217,6 @@ export default class FirstMap extends Phaser.Scene {
                 this.player.destroy();
                 this.scene.start('dungeonMap');
                 this.playerInDungeon = true;
-
             });
         })
         // add tileIndex callback
@@ -242,9 +248,25 @@ export default class FirstMap extends Phaser.Scene {
         //}
         if (menuKeys.E.isDown) {
             this.enableDebugGraphics(this.water);
+
         }
 
+        if (this.input.mousePointer.isDown && !this.fireCld) {
+            const pointer = this.input.activePointer;
+            const worldPoint = pointer.positionToCamera(this.cameras.main);
+            // const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
+            // const snappedWorldPoint = this.map.tileToWorldXY(
+            //   pointerTileXY.x,
+            //   pointerTileXY.y
+            // );
+            console.log(worldPoint)
+            // const angle = Phaser.Math.Angle.BetweenPoints(worldPoint, this.player.sprite.body.center)
+            const missile = this.physics.add.sprite(this.player.sprite.body.center.x + 16, this.player.sprite.body.center.y + 16, 'arrowMissile').setScale(0.6);
+            const angle = Phaser.Math.Angle.BetweenPointsY(worldPoint, missile.body.center)
+            this.physics.moveTo(missile, worldPoint.x, worldPoint.y, 100);
+            missile.setRotation(angle*-1)
+            //this.fireCld = true;
+            console.log(angle * 57.29)
 
-
+        }
     }
-}

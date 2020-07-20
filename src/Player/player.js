@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import PlayerCursor from "./playerCursor";
-import createPlayerAnims from "../anims/player-anims";
+import StatusBar from "../statusBar/statusBar";
+import Missile from "../attackMissile/missile";
 
 // /**
 //  * A class that wraps up our 2D platforming sprite logic. It creates, animates and moves a sprite in
@@ -16,9 +17,11 @@ export default class Player {
       .setMaxVelocity(300, 400)
       .setScale(scale);
     this.playerCursor = new PlayerCursor(scene, playerCursorSprite);
+    this.missile = new Missile(scene, x, y, "arrowMissile");
     this.map = map;
     this.inventory = {};
-
+    this.hp = 300;
+    this.hpBar = new StatusBar(scene, x, y, this.hp);
     // Track the arrow keys & WASD
     const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;
     this.keys = scene.input.keyboard.addKeys({
@@ -33,19 +36,46 @@ export default class Player {
     });
   }
 
-  //create() {
-  //  createPlayerAnims(this.anims);
-  //}
+  preUpdate(time, delta) {
+    super.preUpdate(time, delta);
+  }
+
+  preload() {}
+
+  create() {
+    //this.scene.add.container(this.player.sprite.x,this.player.sprite.y);
+  }
 
   attackHandler() {
     const pointer = this.scene.input.activePointer;
     const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
     const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
-    // const snappedWorldPoint = this.map.tileToWorldXY(
-    //   pointerTileXY.x,
-    //   pointerTileXY.y
-    // );
+    const snappedWorldPoint = this.map.tileToWorldXY(
+      pointerTileXY.x,
+      pointerTileXY.y
+    );
+
+    // this.missile.setPosition(snappedWorldPoint.x, snappedWorldPoint.y).setVisible(true);
+
+    // this.scene.tweens.add({
+    //   targets: this.missile,
+    //   x: snappedWorldPoint.x,
+    //   y: snappedWorldPoint.y,
+    //   ease: 'linear',
+    //   duration: 500,
+    //   // onComplete: (tween, targets) => {
+    //   //   targets[0].setVisible(false);
+    //   // }
+    // })
+    console.log(this.missile);
+
     // this.graphics.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);
+  }
+
+  damaged() {
+    if (this.hpBar.decrease(amount)) {
+      this.alive = false;
+    }
   }
 
   freeze() {
@@ -56,6 +86,9 @@ export default class Player {
     const keys = this.keys;
     const sprite = this.sprite;
     const spriteSpeed = 750;
+
+    // this.hpBar.draw();
+
     //const anims = this.anims;
     //this.playerCursor.update();
 
@@ -124,6 +157,10 @@ export default class Player {
       sprite.anims.play("player-stand", true);
     }
     sprite.body.velocity.normalize().scale(spriteSpeed);
+    this.hpBar.x = sprite.body.position.x;
+    this.hpBar.y = sprite.body.position.y;
+
+    this.hpBar.update();
 
     //     // Update the animation/texture based on the state of the sprite
     //     if (onGround) {

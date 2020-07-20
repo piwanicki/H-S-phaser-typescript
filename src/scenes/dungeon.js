@@ -12,7 +12,7 @@ export default class DungeonScene extends Phaser.Scene {
     super("dungeonMap");
     // Constructor is called once when the scene is created for the first time. When the scene is
     // stopped/started (or restarted), the constructor will NOT be called again.
-    this.level = 0;
+    this.level = 1;
   }
   player;
   dungeon;
@@ -46,8 +46,6 @@ export default class DungeonScene extends Phaser.Scene {
 
   addEnemyInRoom(x, y, sprite) {
     const enemy = this.enemies.get(x, y, sprite);
-    console.log(enemy);
-
     // set active and visible
     enemy.setActive(true);
     enemy.setVisible(true);
@@ -57,12 +55,10 @@ export default class DungeonScene extends Phaser.Scene {
     this.physics.world.enable(enemy);
 
     enemy.body.setSize(enemy.width, enemy.height);
-    console.log(sprite);
     return enemy;
   }
 
   create() {
-    this.level++;
     this.levelComplete = false;
     this.backToSurface = false;
     createPlayerAnims(this.anims);
@@ -98,10 +94,7 @@ export default class DungeonScene extends Phaser.Scene {
     );
     const dungeon2 = map.addTilesetImage("dungeon2", null, 32, 32, 0, 0);
     this.groundLayer = map.createBlankDynamicLayer("groundLayer", dungeon2);
-    //this.groundLayer.fill(TILES.BLANK);
-
     this.wallsLayer = map.createBlankDynamicLayer("wallsLayer", dungeon2);
-
     const tilesetStuff = map.addTilesetImage("dungeonSet", null, 32, 32, 0, 0);
     this.stuffLayer = map.createBlankDynamicLayer("stuffLayer", tilesetStuff);
 
@@ -328,49 +321,57 @@ export default class DungeonScene extends Phaser.Scene {
     const camera = this.cameras.main;
     camera.startFollow(this.player.sprite);
     camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    //camera.setZoom(2.3);
+    camera.setZoom(2);
 
     // Help text that has a "fixed" position on the screen
-    this.add
-      .text(this.scale.width * 2.6, `Slash'em All!! :  Level : ${this.level}`, {
+    this.add.text(
+      this.scale.width * 2.6,
+      `Slash'em All!! :  Level : ${this.level}`,
+      {
         font: "18px monospace",
         fill: "#000000",
         padding: {x: 20, y: 10},
         backgroundColor: "#ffffff",
-      })
-      .setScrollFactor(-2);
+      }
+    );
+    //.setScrollFactor(-2);
 
     // add tileIndex callback
-    this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, () => {
-      this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
-      this.levelComplete = true;
-      this.player.freeze();
-      camera.fade(250, 0, 0, 0);
-      camera.once("camerafadeoutcomplete", () => {
-        this.player.destroy();
-        this.scene.restart();
-      });
-    });
-
-    this.stuffLayer.setTileIndexCallback(TILES.STAIRS_UP, () => {
-      if (this.level === 1) {
-        this.backToSurface = true;
-        this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
-        this.player.freeze();
-        camera.fade(250, 0, 0, 0);
-        camera.once("camerafadeoutcomplete", () => {
-          this.player.destroy();
-          this.scene.start("firstMap");
-        });
-      } else {
+    this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, (sprite) => {
+      if (sprite === this.player.sprite) {
         this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
         this.levelComplete = true;
+        this.level++;
         this.player.freeze();
         camera.fade(250, 0, 0, 0);
         camera.once("camerafadeoutcomplete", () => {
           this.player.destroy();
           this.scene.restart();
         });
+      }
+    });
+
+    this.stuffLayer.setTileIndexCallback(TILES.STAIRS_UP, (sprite) => {
+      if (sprite === this.player.sprite) {
+        if (this.level === 1) {
+          this.backToSurface = true;
+          this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
+          this.player.freeze();
+          camera.fade(250, 0, 0, 0);
+          camera.once("camerafadeoutcomplete", () => {
+            this.player.destroy();
+            this.scene.start("firstMap");
+          });
+        } else {
+          this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
+          this.levelComplete = true;
+          this.player.freeze();
+          camera.fade(250, 0, 0, 0);
+          camera.once("camerafadeoutcomplete", () => {
+            this.player.destroy();
+            this.scene.restart();
+          });
+        }
       }
     });
     const shadowLayer = map
@@ -383,6 +384,7 @@ export default class DungeonScene extends Phaser.Scene {
   update(time, delta) {
     if (this.levelComplete || this.backToSurface) return;
     this.player.update();
+    this.enemies.children.iterate((tentacle) => tentacle.update());
 
     // Find the player's room using another helper method from the dungeon that converts from dungeon XY (in grid units) to the corresponding room instance
     const playerTileX = this.groundLayer.worldToTileX(this.player.sprite.x);

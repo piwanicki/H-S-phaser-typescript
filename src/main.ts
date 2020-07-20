@@ -11,19 +11,18 @@ const config: Phaser.Types.Core.GameConfig = {
 		default: 'arcade',
 		arcade: {
 			gravity: { y: 0 },
-			debug: true
+			debug: false
 		}
 	},
 	//scene: [FirstMap],
-	//scene: [FirstMap, DungeonScene],
-	scene: [DungeonScene],
+	scene: [FirstMap, DungeonScene],
+	//scene: [DungeonScene],
 	scale: {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH
 	},
 	pixelArt: true,
-	roundPixels: true
-
+	roundPixels: true,
 }
 
 export default new Phaser.Game(config)

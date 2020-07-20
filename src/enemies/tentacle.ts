@@ -1,4 +1,5 @@
-import Phaser, { UP } from 'phaser';
+import Phaser from 'phaser';
+import StatusBar from '~/statusBar/statusBar';
 
 enum Direction {
     UP, DOWN, LEFT, RIGHT
@@ -11,6 +12,7 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
     private hp = 200;
     private direction = Direction.UP;
     private moveEvent: Phaser.Time.TimerEvent;
+    private hpBar: StatusBar;
 
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | string) {
@@ -24,6 +26,7 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
             },
             loop: true
         })
+        this.hpBar = new StatusBar(scene, x, y, this.hp)
     }
 
     private tileCollisionHandler(gameObj: Phaser.GameObjects.GameObject, tile: Phaser.Tilemaps.Tile) {
@@ -32,7 +35,10 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
     }
 
     private randomDirection(exclude: Direction) {
-        const newDirection = Phaser.Math.Between(0, 3);
+        let newDirection = Phaser.Math.Between(0, 3);
+        while (newDirection === exclude) {
+            newDirection = Phaser.Math.Between(0, 3);
+        }
         return newDirection;
     }
 
@@ -55,6 +61,12 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
                 this.setVelocity(this.speed, 0)
             }
         }
+    }
+
+    update(time: number, delta: number) {
+        this.hpBar.x = this.body.position.x;
+        this.hpBar.y = this.body.position.y;
+        this.hpBar.update(time, delta);
     }
 
     destroy(fromScene?: boolean) {
