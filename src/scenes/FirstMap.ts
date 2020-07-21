@@ -19,7 +19,8 @@ export default class FirstMap extends Phaser.Scene {
     playerCursor; playerInDungeon;
     statusBar;
     missile;
-    fireCld = false;
+    fireRate = 1000;
+    nextMissile = 0;
     constructor() {
         super("firstMap");
     }
@@ -251,7 +252,8 @@ export default class FirstMap extends Phaser.Scene {
 
         }
 
-        if (this.input.mousePointer.isDown && !this.fireCld) {
+        if (this.input.mousePointer.isDown && this.time.now > this.nextMissile) {
+            this.nextMissile = this.time.now + this.fireRate
             const pointer = this.input.activePointer;
             const worldPoint = pointer.positionToCamera(this.cameras.main);
             // const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
@@ -259,14 +261,10 @@ export default class FirstMap extends Phaser.Scene {
             //   pointerTileXY.x,
             //   pointerTileXY.y
             // );
-            console.log(worldPoint)
-            // const angle = Phaser.Math.Angle.BetweenPoints(worldPoint, this.player.sprite.body.center)
             const missile = this.physics.add.sprite(this.player.sprite.body.center.x + 16, this.player.sprite.body.center.y + 16, 'arrowMissile').setScale(0.6);
             const angle = Phaser.Math.Angle.BetweenPointsY(worldPoint, missile.body.center)
-            this.physics.moveTo(missile, worldPoint.x, worldPoint.y, 100);
-            missile.setRotation(angle*-1)
-            //this.fireCld = true;
-            console.log(angle * 57.29)
+            this.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
+            missile.setRotation(angle * -1)
 
         }
     }
