@@ -18,7 +18,7 @@ export default class FirstMap extends Phaser.Scene {
     player; anims; water; enters;
     playerCursor; playerInDungeon;
     statusBar;
-    missile;
+    missiles;
     fireRate = 1000;
     nextMissile = 0;
     constructor() {
@@ -67,8 +67,6 @@ export default class FirstMap extends Phaser.Scene {
     }
 
     create() {
-
-
 
         const width = this.scale.width;
         const height = this.scale.height;
@@ -149,8 +147,9 @@ export default class FirstMap extends Phaser.Scene {
         );
 
 
-
-        //wthis.missile = this.physics.add.sprite(this.player.sprite.body.center.x, this.player.sprite.body.center.y, 'arrowMissile').setScale(0.6).setVisible(false);
+        this.missiles = this.physics.add.group();
+        //this.physics.add.collider(this.missiles,this.trees);
+        this.physics.add.overlap(this.missiles, this.trees, this.hitWithMissile)
 
         //  generate stones
         for (let i = 1; i < 15; i++) {
@@ -234,6 +233,10 @@ export default class FirstMap extends Phaser.Scene {
         })
     }
 
+    hitWithMissile = (missile) => {
+        missile.destroy();
+    }
+
     update(time, delta) {
         if (this.playerInDungeon) return;
 
@@ -261,7 +264,9 @@ export default class FirstMap extends Phaser.Scene {
             //   pointerTileXY.x,
             //   pointerTileXY.y
             // );
-            const missile = this.physics.add.sprite(this.player.sprite.body.center.x + 16, this.player.sprite.body.center.y + 16, 'arrowMissile').setScale(0.6);
+            //this.missiles = this.physics.add.sprite(this.player.sprite.body.center.x + 16, this.player.sprite.body.center.y + 16, 'arrowMissile').setScale(0.6);
+            const missile = this.missiles.create(this.player.sprite.body.center.x + 16, this.player.sprite.body.center.y + 16, 'arrowMissile').setScale(0.6);
+            console.log(this.missiles)
             const angle = Phaser.Math.Angle.BetweenPointsY(worldPoint, missile.body.center)
             this.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
             missile.setRotation(angle * -1)

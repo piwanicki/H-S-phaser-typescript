@@ -67,8 +67,6 @@ export default class Player {
     //   //   targets[0].setVisible(false);
     //   // }
     // })
-    console.log(this.missile);
-
     // this.graphics.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);
   }
 
