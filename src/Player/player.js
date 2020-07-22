@@ -9,6 +9,10 @@ import Missile from "../attackMissile/missile";
 //  * method when you're done with the sprite.
 //  */
 export default class Player {
+  nextAttack = 0;
+  missiles;
+  fireRate = 1000;
+
   constructor(scene, sprite, x, y, playerCursorSprite, map, scale = 1) {
     this.scene = scene;
     this.sprite = scene.physics.add
@@ -18,12 +22,22 @@ export default class Player {
       .setScale(scale);
     this.playerCursor = new PlayerCursor(scene, playerCursorSprite);
     this.missile = new Missile(scene, x, y, "arrowMissile");
+    this.missiles = scene.physics.add.group();
     this.map = map;
     this.inventory = {};
     this.hp = 300;
     this.hpBar = new StatusBar(scene, x, y, this.hp);
     // Track the arrow keys & WASD
-    const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;
+    const {
+      LEFT,
+      RIGHT,
+      UP,
+      DOWN,
+      W,
+      S,
+      A,
+      D,
+    } = Phaser.Input.Keyboard.KeyCodes;
     this.keys = scene.input.keyboard.addKeys({
       left: LEFT,
       right: RIGHT,
@@ -43,32 +57,29 @@ export default class Player {
   preload() {}
 
   create() {
-    //this.scene.add.container(this.player.sprite.x,this.player.sprite.y);
+    // this.missiles = scene.physics.add.group();
+    this.scene.physics.add.overlap(
+      this.missiles,
+      this.scene.trees,
+      this.hitWithMissile
+    );
   }
 
-  attackHandler() {
-    const pointer = this.scene.input.activePointer;
-    const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
+  attackHandler = () => {
+    const scene = this.scene;
+    const pointer = scene.input.activePointer;
+    const worldPoint = pointer.positionToCamera(scene.cameras.main);
     const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
     const snappedWorldPoint = this.map.tileToWorldXY(
       pointerTileXY.x,
       pointerTileXY.y
     );
+  };
 
-    // this.missile.setPosition(snappedWorldPoint.x, snappedWorldPoint.y).setVisible(true);
-
-    // this.scene.tweens.add({
-    //   targets: this.missile,
-    //   x: snappedWorldPoint.x,
-    //   y: snappedWorldPoint.y,
-    //   ease: 'linear',
-    //   duration: 500,
-    //   // onComplete: (tween, targets) => {
-    //   //   targets[0].setVisible(false);
-    //   // }
-    // })
-    // this.graphics.setPosition(snappedWorldPoint.x, snappedWorldPoint.y);
-  }
+  hitWithMissile = (missile) => {
+    console.log(`missile overlap`);
+    missile.destroy();
+  };
 
   damaged() {
     if (this.hpBar.decrease(amount)) {
@@ -84,6 +95,7 @@ export default class Player {
     const keys = this.keys;
     const sprite = this.sprite;
     const spriteSpeed = 750;
+    const scene = this.scene;
 
     // this.hpBar.draw();
 
@@ -102,7 +114,7 @@ export default class Player {
     // } else {
     //   sprite.setVelocityX(0);
     // }
-    if (this.scene.input.activePointer.isDown) {
+    if (scene.input.activePointer.isDown) {
       this.attackHandler();
     }
 
@@ -159,6 +171,32 @@ export default class Player {
     this.hpBar.y = sprite.body.position.y;
 
     this.hpBar.update();
+
+    if (scene.input.mousePointer.isDown && scene.time.now > this.nextAttack) {
+      this.nextAttack = scene.time.now + this.fireRate;
+      const pointer = scene.input.activePointer;
+      const worldPoint = pointer.positionToCamera(scene.cameras.main);
+      // const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
+      // const snappedWorldPoint = this.map.tileToWorldXY(
+      //   pointerTileXY.x,
+      //   pointerTileXY.y
+      // );
+
+      const missile = this.missiles
+        .create(
+          sprite.body.center.x + 16,
+          sprite.body.center.y + 16,
+          this.missile.sprite
+        )
+        .setScale(0.6)
+        .setVisible(true);
+      const angle = Phaser.Math.Angle.BetweenPointsY(
+        worldPoint,
+        missile.body.center
+      );
+      scene.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
+      missile.setRotation(angle * -1);
+    }
 
     //     // Update the animation/texture based on the state of the sprite
     //     if (onGround) {

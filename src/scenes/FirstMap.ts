@@ -18,9 +18,7 @@ export default class FirstMap extends Phaser.Scene {
     player; anims; water; enters;
     playerCursor; playerInDungeon;
     statusBar;
-    missiles;
-    fireRate = 1000;
-    nextMissile = 0;
+
     constructor() {
         super("firstMap");
     }
@@ -72,6 +70,7 @@ export default class FirstMap extends Phaser.Scene {
         const height = this.scale.height;
         this.playerInDungeon = false;
         createPlayerAnims(this.anims);
+       
 
         const map = this.make.tilemap({ key: "map1" });
         const tilesetMap = map.addTilesetImage('dungeonSet');
@@ -146,10 +145,7 @@ export default class FirstMap extends Phaser.Scene {
             boundrRight
         );
 
-
-        this.missiles = this.physics.add.group();
-        //this.physics.add.collider(this.missiles,this.trees);
-        this.physics.add.overlap(this.missiles, this.trees, this.hitWithMissile)
+        this.player.create();
 
         //  generate stones
         for (let i = 1; i < 15; i++) {
@@ -233,10 +229,6 @@ export default class FirstMap extends Phaser.Scene {
         })
     }
 
-    hitWithMissile = (missile) => {
-        missile.destroy();
-    }
-
     update(time, delta) {
         if (this.playerInDungeon) return;
 
@@ -254,22 +246,5 @@ export default class FirstMap extends Phaser.Scene {
             this.enableDebugGraphics(this.water);
 
         }
-
-        if (this.input.mousePointer.isDown && this.time.now > this.nextMissile) {
-            this.nextMissile = this.time.now + this.fireRate
-            const pointer = this.input.activePointer;
-            const worldPoint = pointer.positionToCamera(this.cameras.main);
-            // const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
-            // const snappedWorldPoint = this.map.tileToWorldXY(
-            //   pointerTileXY.x,
-            //   pointerTileXY.y
-            // );
-            //this.missiles = this.physics.add.sprite(this.player.sprite.body.center.x + 16, this.player.sprite.body.center.y + 16, 'arrowMissile').setScale(0.6);
-            const missile = this.missiles.create(this.player.sprite.body.center.x + 16, this.player.sprite.body.center.y + 16, 'arrowMissile').setScale(0.6);
-            console.log(this.missiles)
-            const angle = Phaser.Math.Angle.BetweenPointsY(worldPoint, missile.body.center)
-            this.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
-            missile.setRotation(angle * -1)
-
-        }
     }
+}
