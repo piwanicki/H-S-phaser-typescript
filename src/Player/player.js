@@ -74,7 +74,7 @@ export default class Player {
       missile.body.center
     );
     scene.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
-    missile.setRotation(angle * -1);
+    //missile.setRotation(angle*-1);
   };
 
   hitWithMissile = (missile) => {
