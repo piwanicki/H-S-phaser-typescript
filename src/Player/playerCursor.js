@@ -4,9 +4,9 @@ export default class playerCursor {
     this.scene = scene;
 
     this.graphics = scene.add.graphics();
-    scene.input.setDefaultCursor(
-      `url(assets/images/player/cursors/${sprite}), pointer`
-    );
+    // scene.input.setDefaultCursor(
+    //   `url(assets/images/player/cursors/${sprite}), pointer`
+    // );
   }
 
   destroy() {

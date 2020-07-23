@@ -21,23 +21,14 @@ export default class Player {
       .setMaxVelocity(300, 400)
       .setScale(scale);
     this.playerCursor = new PlayerCursor(scene, playerCursorSprite);
-    this.missile = new Missile(scene, x, y, "arrowMissile");
+    this.missile = new Missile(scene, "arrowMissile");
     this.missiles = scene.physics.add.group();
     this.map = map;
     this.inventory = {};
     this.hp = 300;
     this.hpBar = new StatusBar(scene, x, y, this.hp);
     // Track the arrow keys & WASD
-    const {
-      LEFT,
-      RIGHT,
-      UP,
-      DOWN,
-      W,
-      S,
-      A,
-      D,
-    } = Phaser.Input.Keyboard.KeyCodes;
+    const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;
     this.keys = scene.input.keyboard.addKeys({
       left: LEFT,
       right: RIGHT,
@@ -57,7 +48,7 @@ export default class Player {
   preload() {}
 
   create() {
-    // this.missiles = scene.physics.add.group();
+    this.missiles.create(this.sprite.x, this.sprite.y, this.missile.sprite);
     this.scene.physics.add.overlap(
       this.missiles,
       this.scene.trees,
@@ -67,13 +58,41 @@ export default class Player {
 
   attackHandler = () => {
     const scene = this.scene;
-    const pointer = scene.input.activePointer;
+    const pointer = scene.input.mousePointer;
     const worldPoint = pointer.positionToCamera(scene.cameras.main);
     const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
     const snappedWorldPoint = this.map.tileToWorldXY(
       pointerTileXY.x,
       pointerTileXY.y
     );
+
+    this.nextAttack = scene.time.now + this.fireRate;
+    console.log(this.sprite);
+    // const missile = this.missiles
+    //   .create(
+    //     this.sprite.body.center.x,
+    //     this.sprite.body.center.y,
+    //     this.missile.sprite
+    //   )
+    const missile = this.missiles.create(
+      this.sprite.x,
+      this.sprite.y,
+      this.missile.sprite
+    );
+
+    //.setScale(0.5)
+    //.setVisible(true).setPosition(this.sprite.x+16,this.sprite.y+16)
+
+    //.setOffset(16,16)
+    console.log(missile);
+    const angle = Phaser.Math.Angle.BetweenPointsY(
+      worldPoint,
+      missile.body.center
+    );
+    scene.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
+    //scene.physics.moveTo(missile, crosshairX, crosshairY, 400);
+
+    missile.setRotation(angle * -1);
   };
 
   hitWithMissile = (missile) => {
@@ -114,6 +133,8 @@ export default class Player {
     // } else {
     //   sprite.setVelocityX(0);
     // }
+
+    //if (scene.input.activePointer.isDown && scene.time.now > this.nextAttack) {
     if (scene.input.activePointer.isDown) {
       this.attackHandler();
     }
@@ -172,31 +193,31 @@ export default class Player {
 
     this.hpBar.update();
 
-    if (scene.input.mousePointer.isDown && scene.time.now > this.nextAttack) {
-      this.nextAttack = scene.time.now + this.fireRate;
-      const pointer = scene.input.activePointer;
-      const worldPoint = pointer.positionToCamera(scene.cameras.main);
-      // const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
-      // const snappedWorldPoint = this.map.tileToWorldXY(
-      //   pointerTileXY.x,
-      //   pointerTileXY.y
-      // );
-
-      const missile = this.missiles
-        .create(
-          sprite.body.center.x + 16,
-          sprite.body.center.y + 16,
-          this.missile.sprite
-        )
-        .setScale(0.6)
-        .setVisible(true);
-      const angle = Phaser.Math.Angle.BetweenPointsY(
-        worldPoint,
-        missile.body.center
-      );
-      scene.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
-      missile.setRotation(angle * -1);
-    }
+    // if (scene.input.mousePointer.isDown && scene.time.now > this.nextAttack) {
+    // this.nextAttack = scene.time.now + this.fireRate;
+    // const pointer = scene.input.activePointer;
+    // const worldPoint = pointer.positionToCamera(scene.cameras.main);
+    // const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
+    // const snappedWorldPoint = this.map.tileToWorldXY(
+    // pointerTileXY.x,
+    // pointerTileXY.y
+    // );
+    //
+    // const missile = this.missiles
+    // .create(
+    // sprite.body.center.x + 16,
+    // sprite.body.center.y + 16,
+    // this.missile.sprite
+    // )
+    // .setScale(0.6)
+    // .setVisible(true);
+    // const angle = Phaser.Math.Angle.BetweenPointsY(
+    // worldPoint,
+    // missile.body.center
+    // );
+    // scene.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
+    // missile.setRotation(angle * -1);
+    // }
 
     //     // Update the animation/texture based on the state of the sprite
     //     if (onGround) {

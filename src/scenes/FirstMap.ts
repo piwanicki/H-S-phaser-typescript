@@ -70,7 +70,7 @@ export default class FirstMap extends Phaser.Scene {
         const height = this.scale.height;
         this.playerInDungeon = false;
         createPlayerAnims(this.anims);
-       
+
 
         const map = this.make.tilemap({ key: "map1" });
         const tilesetMap = map.addTilesetImage('dungeonSet');

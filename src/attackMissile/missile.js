@@ -1,9 +1,7 @@
 export default class Missile extends Phaser.GameObjects.Image {
-  constructor(scene, x, y, sprite) {
-    super(scene, x, y);
+  constructor(scene, sprite) {
+    super(scene);
     this.sprite = sprite;
-    // this.sprite = sprite;
-    // (this.x = x), (this.y = y);
     this.visible = false;
   }
 }
