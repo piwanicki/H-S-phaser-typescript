@@ -48,7 +48,6 @@ export default class Player {
   preload() {}
 
   create() {
-    this.missiles.create(this.sprite.x, this.sprite.y, this.missile.sprite);
     this.scene.physics.add.overlap(
       this.missiles,
       this.scene.trees,
@@ -67,31 +66,14 @@ export default class Player {
     );
 
     this.nextAttack = scene.time.now + this.fireRate;
-    console.log(this.sprite);
-    // const missile = this.missiles
-    //   .create(
-    //     this.sprite.body.center.x,
-    //     this.sprite.body.center.y,
-    //     this.missile.sprite
-    //   )
-    const missile = this.missiles.create(
-      this.sprite.x,
-      this.sprite.y,
-      this.missile.sprite
-    );
-
-    //.setScale(0.5)
-    //.setVisible(true).setPosition(this.sprite.x+16,this.sprite.y+16)
-
-    //.setOffset(16,16)
-    console.log(missile);
+    const missile = this.missiles
+      .create(this.sprite.x, this.sprite.y, this.missile.sprite)
+      .setOrigin(0, 0);
     const angle = Phaser.Math.Angle.BetweenPointsY(
       worldPoint,
       missile.body.center
     );
     scene.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
-    //scene.physics.moveTo(missile, crosshairX, crosshairY, 400);
-
     missile.setRotation(angle * -1);
   };
 
