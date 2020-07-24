@@ -15,8 +15,7 @@ export default class MissileContainer extends Phaser.GameObjects.Container {
         this.display.setScale(0.8);
         this.physicsBody.setCircle(8, -8, -8);
         scene.add.existing(this);
-
-
+        this.physicsBody.onOverlap = true;
     };
 
 

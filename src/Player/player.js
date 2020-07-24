@@ -55,6 +55,10 @@ export default class Player {
   }
 
   create() {
+    this.missiles = this.scene.physics.add.group({
+      classType: MissileContainer,
+    });
+
     this.scene.physics.add.overlap(
       this.missiles,
       this.scene.trees,
@@ -129,7 +133,7 @@ export default class Player {
     const scene = this.scene;
 
     //if (scene.input.activePointer.isDown && scene.time.now > this.nextAttack) {
-    if (scene.input.activePointer.isDown) {
+    if (scene.input.activePointer.isDown && scene.time.now > this.nextAttack) {
       this.attackHandler();
     }
     // Horizontal movement
