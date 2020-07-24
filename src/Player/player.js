@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import PlayerCursor from "./playerCursor";
 import StatusBar from "../statusBar/statusBar";
 import Missile from "../attackMissile/missile";
+import MissileContainer from "../attackMissile/MissileContainer";
 
 // /**
 //  * A class that wraps up our 2D platforming sprite logic. It creates, animates and moves a sprite in
@@ -10,8 +11,11 @@ import Missile from "../attackMissile/missile";
 //  */
 export default class Player {
   nextAttack = 0;
+  missile;
   missiles;
   fireRate = 1000;
+  attack = 12;
+  strength = 3;
 
   constructor(scene, sprite, x, y, playerCursorSprite, map, scale = 1) {
     this.scene = scene;
@@ -20,13 +24,18 @@ export default class Player {
       .setDrag(1000, 0)
       .setMaxVelocity(300, 400)
       .setScale(scale);
-    this.playerCursor = new PlayerCursor(scene, playerCursorSprite);
-    this.missile = new Missile(scene, "arrowMissile");
+    this.playerCursorSprite = playerCursorSprite;
     this.missiles = scene.physics.add.group();
     this.map = map;
     this.inventory = {};
     this.hp = 300;
-    this.hpBar = new StatusBar(scene, x, y, this.hp);
+    this.hpBar = new StatusBar(
+      this.scene,
+      this.sprite.x,
+      this.sprite.y,
+      this.hp
+    );
+    this.playerCursor = new PlayerCursor(this.scene, this.playerCursorSprite);
     // Track the arrow keys & WASD
     const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;
     this.keys = scene.input.keyboard.addKeys({
@@ -45,41 +54,62 @@ export default class Player {
     super.preUpdate(time, delta);
   }
 
-  preload() {}
-
   create() {
     this.scene.physics.add.overlap(
       this.missiles,
       this.scene.trees,
       this.hitWithMissile
     );
+
+    // this.scene.physics.add.overlap(
+    //   this.missiles,
+    //   this.scene.enemies,
+    //   this.damageEnemy
+    // );
   }
 
   attackHandler = () => {
     const scene = this.scene;
     const pointer = scene.input.mousePointer;
     const worldPoint = pointer.positionToCamera(scene.cameras.main);
-    const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
-    const snappedWorldPoint = this.map.tileToWorldXY(
-      pointerTileXY.x,
-      pointerTileXY.y
-    );
+    //const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
+
+    // const snappedWorldPoint = this.map.tileToWorldXY(
+    //   pointerTileXY.x,
+    //   pointerTileXY.y
+    // );
 
     this.nextAttack = scene.time.now + this.fireRate;
-    const missile = this.missiles
-      .create(this.sprite.x, this.sprite.y, this.missile.sprite)
-      .setOrigin(0, 0);
-    const angle = Phaser.Math.Angle.BetweenPointsY(
-      worldPoint,
-      missile.body.center
+    const angle = Phaser.Math.Angle.Between(
+      this.sprite.x,
+      this.sprite.y,
+      pointer.x + this.scene.cameras.main.scrollX,
+      pointer.y + this.scene.cameras.main.scrollY
     );
-    scene.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
-    //missile.setRotation(angle*-1);
+
+    this.missile = new MissileContainer(
+      this.scene,
+      this.sprite.x,
+      this.sprite.y,
+      "arrowMissile"
+    );
+    this.missiles.add(this.missile, false);
+    this.missile.angle = angle * 57.29;
+    scene.physics.moveTo(this.missile, worldPoint.x, worldPoint.y, 400);
   };
 
   hitWithMissile = (missile) => {
-    console.log(`missile overlap`);
     missile.destroy();
+  };
+
+  damageEnemy = (missile) => {
+    // target
+    const dmg = Phaser.Math.Between(
+      this.attack * this.strength,
+      this.attack * this.strength * 1.2
+    );
+    missile.destroy();
+    console.log(dmg);
   };
 
   damaged() {
@@ -98,29 +128,10 @@ export default class Player {
     const spriteSpeed = 750;
     const scene = this.scene;
 
-    // this.hpBar.draw();
-
-    //const anims = this.anims;
-    //this.playerCursor.update();
-
-    //     // Apply horizontal acceleration when left/a or right/d are applied
-    // if (keys.left.isDown || keys.a.isDown) {
-    //   sprite.setVelocityX(-acceleration);
-    //   // No need to have a separate set of graphics for running to the left & to the right. Instead
-    //   // we can just mirror the sprite.
-    //   sprite.setFlipX(true);
-    // } else if (keys.right.isDown || keys.d.isDown) {
-    //   sprite.setVelocityX(acceleration);
-    //   sprite.setFlipX(false);
-    // } else {
-    //   sprite.setVelocityX(0);
-    // }
-
     //if (scene.input.activePointer.isDown && scene.time.now > this.nextAttack) {
     if (scene.input.activePointer.isDown) {
       this.attackHandler();
     }
-
     // Horizontal movement
     if (keys.left.isDown) {
       sprite.setVelocityX(-spriteSpeed);
@@ -129,14 +140,12 @@ export default class Player {
       sprite.setVelocityX(spriteSpeed);
       sprite.anims.play("player-right-walk", true);
     }
-
     // Vertical movement
     else if (keys.up.isDown) {
       sprite.setVelocityY(-spriteSpeed);
     } else if (keys.down.isDown) {
       sprite.setVelocityY(spriteSpeed);
     }
-
     // additional movement
     else if (keys.W.isDown && keys.A.isDown) {
       sprite.setVelocityY(-spriteSpeed);
@@ -174,32 +183,6 @@ export default class Player {
     this.hpBar.y = sprite.body.position.y;
 
     this.hpBar.update();
-
-    // if (scene.input.mousePointer.isDown && scene.time.now > this.nextAttack) {
-    // this.nextAttack = scene.time.now + this.fireRate;
-    // const pointer = scene.input.activePointer;
-    // const worldPoint = pointer.positionToCamera(scene.cameras.main);
-    // const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
-    // const snappedWorldPoint = this.map.tileToWorldXY(
-    // pointerTileXY.x,
-    // pointerTileXY.y
-    // );
-    //
-    // const missile = this.missiles
-    // .create(
-    // sprite.body.center.x + 16,
-    // sprite.body.center.y + 16,
-    // this.missile.sprite
-    // )
-    // .setScale(0.6)
-    // .setVisible(true);
-    // const angle = Phaser.Math.Angle.BetweenPointsY(
-    // worldPoint,
-    // missile.body.center
-    // );
-    // scene.physics.moveTo(missile, worldPoint.x, worldPoint.y, 400);
-    // missile.setRotation(angle * -1);
-    // }
 
     //     // Update the animation/texture based on the state of the sprite
     //     if (onGround) {

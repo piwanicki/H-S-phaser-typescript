@@ -40,7 +40,7 @@ export default class FirstMap extends Phaser.Scene {
         this.load.image('waterEdge-up', 'assets/images/waters/deep_water_wave_north.png')
         this.load.image('waterEdge-down', 'assets/images/waters/deep_water_wave_south.png')
         this.load.image('statusBar', 'assets/images/statusBar.png');
-        this.load.image('arrowMissile', 'assets/images/player/arrow_0.png');
+        this.load.image('arrowMissile', 'assets/images/player/arrow.png');
 
     }
 
@@ -236,15 +236,12 @@ export default class FirstMap extends Phaser.Scene {
         const menuKeys = this.input.keyboard.addKeys({
             E: 'E',
         });
-        // Convert the mouse position to world position within the camera
-        const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
         // Draw tiles (only within the groundLayer)
         //if (this.input.manager.activePointer.isDown) {
         //    this.ground?.putTileAtWorldXY(400, worldPoint.x, worldPoint.y);
         //}
-        if (menuKeys.E.isDown) {
-            this.enableDebugGraphics(this.water);
-
-        }
+        // if (menuKeys.E.isDown) {
+        //     this.enableDebugGraphics(this.water);
+        // }
     }
 }
