@@ -42,6 +42,14 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
         return newDirection;
     }
 
+    private takeDamage(dmg: number) {
+        this.hp -= dmg;
+        this.hpBar.decrease(dmg);
+        if(this.hp <= 0) {
+            this.destroy();
+        }
+    }
+
     preUpdate(time: number, delta: number) {
         super.preUpdate(time, delta);
         switch (this.direction) {

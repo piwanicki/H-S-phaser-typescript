@@ -65,11 +65,11 @@ export default class Player {
       this.hitWithMissile
     );
 
-    // this.scene.physics.add.overlap(
-    //   this.missiles,
-    //   this.scene.enemies,
-    //   this.damageEnemy
-    // );
+    this.scene.physics.add.overlap(
+      this.missiles,
+      this.scene.enemies,
+      this.damageEnemy
+    );
   }
 
   attackHandler = () => {
@@ -112,8 +112,8 @@ export default class Player {
       this.attack * this.strength,
       this.attack * this.strength * 1.2
     );
-    missile.destroy();
-    console.log(dmg);
+    this.hitWithMissile(missile)
+    return dmg;
   };
 
   damaged() {

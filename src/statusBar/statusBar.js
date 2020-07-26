@@ -5,30 +5,33 @@ export default class StatusBar {
     this.x = x;
     this.y = y;
     this.value = value;
-    this.maxValue = this.value;
-    this.p = this.value / this.maxValue;
-
+    this.maxValue = value;
     scene.add.existing(this.bar);
     this.draw();
   }
+
   decrease(amount) {
     this.value -= amount;
     if (this.value < 0) {
       this.value = 0;
     }
+    if(this.value === 0) {
+      this.bar.destroy() ;
+      return;
+    }
     this.draw();
-    return this.value === 0;
+   
   }
 
   draw() {
     this.bar.clear();
     //  BG
-    this.bar.fillStyle(0x000000);
-    //this.bar.fillRect(this.x, this.y, 32, 6);
+    this.bar.fillStyle(0xffffff);
+    this.bar.fillRect(this.x, this.y - 8, 32, 5);
 
     //  Health
     this.bar.fillStyle(0xffffff);
-    this.bar.fillRect(this.x, this.y - 10, 32, 5);
+    this.bar.fillRect(this.x, this.y - 8, 32, 5);
 
     if (this.value < 30) {
       this.bar.fillStyle(0xff0000);
@@ -36,13 +39,14 @@ export default class StatusBar {
       this.bar.fillStyle(0x00ff00);
     }
 
-    const hp = this.p * 32;
-    this.bar.fillRect(this.x, this.y - 10, hp, 5);
+    const hp = (this.value / this.maxValue) * 32;
+    this.bar.fillRect(this.x, this.y - 8, hp, 5);
   }
 
   update(delta, time) {
     this.draw();
   }
+
 }
 
 // class Missile extends Phaser.GameObjects.Image {
