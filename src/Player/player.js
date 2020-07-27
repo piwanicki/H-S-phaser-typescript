@@ -13,7 +13,7 @@ export default class Player {
   nextAttack = 0;
   missile;
   missiles;
-  fireRate = 1000;
+  fireRate = 300;
   attack = 12;
   strength = 3;
 
@@ -65,11 +65,11 @@ export default class Player {
       this.hitWithMissile
     );
 
-    this.scene.physics.add.overlap(
-      this.missiles,
-      this.scene.enemies,
-      this.damageEnemy
-    );
+    // this.scene.physics.add.overlap(
+    //   this.missiles,
+    //   this.scene.enemies,
+    //   this.damageEnemy
+    // );
   }
 
   attackHandler = () => {
@@ -112,8 +112,23 @@ export default class Player {
       this.attack * this.strength,
       this.attack * this.strength * 1.2
     );
-    this.hitWithMissile(missile)
+    this.hitWithMissile(missile);
     return dmg;
+  };
+
+  takeDamage = (dmg) => {
+    if (!dmg) return;
+    this.hp -= dmg;
+    this.hpBar.decrease(dmg);
+    if (this.hp <= 0) {
+      this.destroy();
+      return;
+    }
+
+    const body = this.sprite.body;
+    // push back after took dmg
+    const [velX, velY] = [body.velocity.x, body.velocity.y];
+    console.log(velX, velY);
   };
 
   damaged() {
@@ -129,10 +144,10 @@ export default class Player {
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
+    if (!sprite) return;
     const spriteSpeed = 750;
     const scene = this.scene;
 
-    //if (scene.input.activePointer.isDown && scene.time.now > this.nextAttack) {
     if (scene.input.activePointer.isDown && scene.time.now > this.nextAttack) {
       this.attackHandler();
     }

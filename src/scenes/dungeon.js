@@ -308,16 +308,32 @@ export default class DungeonScene extends Phaser.Scene {
     // Watch the player and layer for collisions, for the duration of the scene:
     this.physics.add.collider(this.player.sprite, this.wallsLayer);
     this.physics.add.collider(this.player.sprite, this.stuffLayer);
-    this.physics.add.collider(this.player.sprite, this.enemies);
+    this.physics.add.collider(
+      this.player.sprite,
+      this.enemies,
+      (player, enemy) => {
+        const dmg = enemy.dealDamage();
+        this.player.takeDamage(dmg);
+      }
+    );
 
-    this.physics.add.collider(this.player.missiles, this.enemies, (missile,enemy) => {
-      const dmg = this.player.damageEnemy(missile);
-      enemy.takeDamage(dmg);
-    });
+    this.physics.add.collider(
+      this.player.missiles,
+      this.enemies,
+      (missile, enemy) => {
+        const dmg = this.player.damageEnemy(missile);
+        enemy.takeDamage(dmg);
+      }
+    );
 
-     this.physics.add.collider(this.player.missiles, this.wallsLayer, (missile) => {
-      this.player.hitWithMissile(missile);
-    });
+    this.physics.add.collider(
+      this.player.missiles,
+      this.wallsLayer,
+      (missile) => {
+        this.player.hitWithMissile(missile);
+      }
+    );
+
     this.physics.add.collider(this.wallsLayer, this.enemies);
     this.physics.add.collider(this.stuffLayer, this.enemies);
 

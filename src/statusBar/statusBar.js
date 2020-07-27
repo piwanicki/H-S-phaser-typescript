@@ -15,12 +15,11 @@ export default class StatusBar {
     if (this.value < 0) {
       this.value = 0;
     }
-    if(this.value === 0) {
-      this.bar.destroy() ;
+    if (this.value === 0) {
+      this.bar.destroy();
       return;
     }
     this.draw();
-   
   }
 
   draw() {
@@ -33,7 +32,9 @@ export default class StatusBar {
     this.bar.fillStyle(0xffffff);
     this.bar.fillRect(this.x, this.y - 8, 32, 5);
 
-    if (this.value < 30) {
+    if (this.value / this.maxValue < 0.5 && this.value / this.maxValue > 0.3) {
+      this.bar.fillStyle(0xffff00);
+    } else if (this.value / this.maxValue < .3) {
       this.bar.fillStyle(0xff0000);
     } else {
       this.bar.fillStyle(0x00ff00);
@@ -46,7 +47,6 @@ export default class StatusBar {
   update(delta, time) {
     this.draw();
   }
-
 }
 
 // class Missile extends Phaser.GameObjects.Image {
