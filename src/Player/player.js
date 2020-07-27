@@ -11,11 +11,13 @@ import MissileContainer from "../attackMissile/MissileContainer";
 //  */
 export default class Player {
   nextAttack = 0;
+  hitTintDuration = 0;
   missile;
   missiles;
   fireRate = 300;
   attack = 12;
   strength = 3;
+  damageTime = 300;
 
   constructor(scene, sprite, x, y, playerCursorSprite, map, scale = 1) {
     this.scene = scene;
@@ -116,7 +118,7 @@ export default class Player {
     return dmg;
   };
 
-  takeDamage = (dmg) => {
+  takeDamage = (dmg, dir) => {
     if (!dmg) return;
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
@@ -124,11 +126,12 @@ export default class Player {
       this.destroy();
       return;
     }
-
+    this.sprite.setTint(0xc70404);
     const body = this.sprite.body;
+
     // push back after took dmg
-    const [velX, velY] = [body.velocity.x, body.velocity.y];
-    console.log(velX, velY);
+    this.scene.physics.moveTo(this.sprite, dir.x, dir.y, 500);
+    this.hitTintDuration = this.scene.time.now + this.damageTime;
   };
 
   damaged() {
@@ -144,9 +147,13 @@ export default class Player {
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
-    if (!sprite) return;
     const spriteSpeed = 750;
     const scene = this.scene;
+
+    //reset TinCollor
+    if (this.scene.time.now > this.hitTintDuration) {
+      sprite.setTint(0xffffff);
+    }
 
     if (scene.input.activePointer.isDown && scene.time.now > this.nextAttack) {
       this.attackHandler();
@@ -214,6 +221,7 @@ export default class Player {
   }
 
   destroy() {
-    this.sprite.destroy();
+    this.sprite.setActive(false).setVisible(false);
+    this.freeze();
   }
 }

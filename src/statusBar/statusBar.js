@@ -34,7 +34,7 @@ export default class StatusBar {
 
     if (this.value / this.maxValue < 0.5 && this.value / this.maxValue > 0.3) {
       this.bar.fillStyle(0xffff00);
-    } else if (this.value / this.maxValue < .3) {
+    } else if (this.value / this.maxValue < 0.3) {
       this.bar.fillStyle(0xff0000);
     } else {
       this.bar.fillStyle(0x00ff00);

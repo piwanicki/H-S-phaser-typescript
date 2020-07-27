@@ -7,9 +7,9 @@ export default class MissileContainer extends Phaser.GameObjects.Container {
         return this.body as Phaser.Physics.Arcade.Body;
     }
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
         super(scene, x, y);
-        this.display = scene.add.image(0, 0, 'arrowMissile');
+        this.display = scene.add.image(0, 0, texture);
         this.add(this.display);
         scene.physics.add.existing(this);
         this.display.setScale(0.8);
@@ -18,6 +18,6 @@ export default class MissileContainer extends Phaser.GameObjects.Container {
         this.physicsBody.onOverlap = true;
     };
 
-    
+
 
 }

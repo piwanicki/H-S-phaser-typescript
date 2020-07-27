@@ -42,6 +42,8 @@ export default class DungeonScene extends Phaser.Scene {
       margin: 0,
       spacing: 0,
     });
+
+    this.load.image("tentacleMissile", "assets/images/enemies/poison.png");
   }
 
   addEnemyInRoom(x, y, sprite) {
@@ -313,7 +315,10 @@ export default class DungeonScene extends Phaser.Scene {
       this.enemies,
       (player, enemy) => {
         const dmg = enemy.dealDamage();
-        this.player.takeDamage(dmg);
+        const dx = this.player.sprite.x - enemy.x;
+        const dy = this.player.sprite.y - enemy.y;
+        const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(2000);
+        this.player.takeDamage(dmg, dir);
       }
     );
 
@@ -336,8 +341,6 @@ export default class DungeonScene extends Phaser.Scene {
 
     this.physics.add.collider(this.wallsLayer, this.enemies);
     this.physics.add.collider(this.stuffLayer, this.enemies);
-
-    //this.physics.add.collider(this.player.missiles, this.wallsLayer);
 
     // Phaser supports multiple cameras, but you can access the default camera like this:
     const camera = this.cameras.main;
