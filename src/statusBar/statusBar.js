@@ -29,7 +29,7 @@ export default class StatusBar {
     this.bar.fillRect(this.x, this.y - 8, 32, 5);
 
     //  Health
-    this.bar.fillStyle(0x989898);
+    //this.bar.fillStyle(0x989898);
     this.bar.fillRect(this.x, this.y - 8, 32, 5);
 
     if (this.value / this.maxValue < 0.5 && this.value / this.maxValue > 0.3) {

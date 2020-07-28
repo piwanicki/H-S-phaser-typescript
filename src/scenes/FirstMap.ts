@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import Player from '../Player/player';
 import TILES from './tileMapping';
 import createPlayerAnims from '../anims/player-anims';
-import StatusBar from '../statusBar/statusBar';
+import { scenesKeys } from './scenesKeys';
 
 export default class FirstMap extends Phaser.Scene {
     private background?: Phaser.GameObjects.TileSprite;
@@ -19,7 +19,7 @@ export default class FirstMap extends Phaser.Scene {
     playerCursor; playerInDungeon;
     statusBar;
 
-    constructor() { 
+    constructor() {
         super("firstMap");
     }
 
@@ -74,7 +74,7 @@ export default class FirstMap extends Phaser.Scene {
 
 
         const map = this.make.tilemap({ key: "map1" });
-        const tilesetMap = map.addTilesetImage('dungeonSet','dungeonSet', 32, 32, 1, 2);
+        const tilesetMap = map.addTilesetImage('dungeonSet', 'dungeonSet', 32, 32, 1, 2);
         this.ground = map.createDynamicLayer("ground", tilesetMap, 0, 0);
         this.water = map.createDynamicLayer('water', tilesetMap, 0, 0);
         this.paths = map.createDynamicLayer('paths', tilesetMap, 0, 0);
@@ -212,7 +212,7 @@ export default class FirstMap extends Phaser.Scene {
             camera.fade(250, 0, 0, 0);
             camera.once('camerafadeoutcomplete', () => {
                 this.player.destroy();
-                this.scene.start('dungeonMap');
+                this.scene.start(scenesKeys.scenes.DUNGEON);
                 this.playerInDungeon = true;
             });
         })
@@ -224,7 +224,7 @@ export default class FirstMap extends Phaser.Scene {
             camera.fade(250, 0, 0, 0);
             camera.once('camerafadeoutcomplete', () => {
                 this.player.destroy();
-                this.scene.start('dungeonMap');
+                this.scene.start(scenesKeys.scenes.DUNGEON);
                 this.playerInDungeon = true;
             });
         })

@@ -6,10 +6,11 @@ import TilemapVisibility from "./tilemapVisibility";
 import Tentacle from "~/enemies/tentacle";
 import createTentacleAnims from "../anims/tentacle-anims";
 import createPlayerAnims from "../anims/player-anims";
+import {scenesKeys} from "./scenesKeys";
 
 export default class DungeonScene extends Phaser.Scene {
   constructor() {
-    super("dungeonMap");
+    super(scenesKeys.scenes.DUNGEON);
     // Constructor is called once when the scene is created for the first time. When the scene is
     // stopped/started (or restarted), the constructor will NOT be called again.
     this.level = 1;
@@ -367,9 +368,13 @@ export default class DungeonScene extends Phaser.Scene {
       }
     );
 
-    this.physics.add.collider(this.player.missiles, this.stuffLayer, (missile) => {
-      this.player.hitWithMissile(missile);
-    })
+    this.physics.add.collider(
+      this.player.missiles,
+      this.stuffLayer,
+      (missile) => {
+        this.player.hitWithMissile(missile);
+      }
+    );
 
     // Phaser supports multiple cameras, but you can access the default camera like this:
     const camera = this.cameras.main;
