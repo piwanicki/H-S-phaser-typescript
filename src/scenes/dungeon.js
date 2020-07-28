@@ -73,6 +73,19 @@ export default class DungeonScene extends Phaser.Scene {
     return enemy;
   }
 
+  enemyCollisionDmgHandler = (enemy) => {
+    const dmg = enemy.dealPhysicalDamage();
+    //const dx = this.player.sprite.x - enemy.x;
+    //const dy = this.player.sprite.y - enemy.y;
+    //const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(2000);
+    this.player.takeDamage(dmg);
+  };
+
+  playerMissilesCollisionDmgHandler = (missile, enemy) => {
+    const dmg = this.player.damageEnemy(missile);
+    enemy.takeDamage(dmg);
+  };
+
   create() {
     this.levelComplete = false;
     this.backToSurface = false;
@@ -334,11 +347,7 @@ export default class DungeonScene extends Phaser.Scene {
       this.player.sprite,
       this.enemies,
       (player, enemy) => {
-        const dmg = enemy.dealPhysicalDamage();
-        //const dx = this.player.sprite.x - enemy.x;
-        //const dy = this.player.sprite.y - enemy.y;
-        //const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(2000);
-        this.player.takeDamage(dmg);
+        this.enemyCollisionDmgHandler(enemy);
       }
     );
 
@@ -346,8 +355,7 @@ export default class DungeonScene extends Phaser.Scene {
       this.player.missiles,
       this.enemies,
       (missile, enemy) => {
-        const dmg = this.player.damageEnemy(missile);
-        enemy.takeDamage(dmg);
+        this.playerMissilesCollisionDmgHandler(missile, enemy);
       }
     );
 
@@ -359,10 +367,9 @@ export default class DungeonScene extends Phaser.Scene {
       }
     );
 
-    this.physics.add.collider(this.wallsLayer, this.enemies);
-    this.physics.add.collider(this.stuffLayer, this.enemies);
-
-    this.physics.add.collider(this.stuffLayer, this.enemies);
+    this.physics.add.collider(this.player.missiles, this.stuffLayer, (missile) => {
+      this.player.hitWithMissile(missile);
+    })
 
     // Phaser supports multiple cameras, but you can access the default camera like this:
     const camera = this.cameras.main;

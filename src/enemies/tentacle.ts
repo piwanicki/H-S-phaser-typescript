@@ -48,8 +48,13 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
             classType: MissileContainer,
         });
 
-        scene.physics.add.overlap(this.missiles, scene.player.sprite, (player, missile) => this.missileTileCollisionHandler(missile, player));
-        scene.physics.add.collider(this.missiles, scene.wallsLayer, (missile, player) => {
+        scene.physics.add.overlap(this.missiles, scene.player.sprite, (player, missile) => {
+            this.missileTileCollisionHandler(missile, player)
+        });
+        scene.physics.add.collider(this.missiles, scene.wallsLayer, (missile, wallsLayer) => {
+            this.hitWithMissile(missile);
+        })
+        scene.physics.add.collider(this.missiles, scene.stuffLayer, (missile, stuffLayer) => {
             this.hitWithMissile(missile);
         })
     }
@@ -159,7 +164,7 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(time: number, delta: number) {
-        if(this.dead) return;
+        if (this.dead) return;
         this.hpBar.x = this.body.position.x;
         this.hpBar.y = this.body.position.y;
         this.hpBar.update(time, delta);
