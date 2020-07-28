@@ -15,8 +15,8 @@ const config: Phaser.Types.Core.GameConfig = {
 		}
 	},
 	//scene: [FirstMap],
-	scene: [FirstMap, DungeonScene],
-	//scene: [DungeonScene],
+	//scene: [FirstMap, DungeonScene],
+	scene: [DungeonScene],
 	scale: {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH

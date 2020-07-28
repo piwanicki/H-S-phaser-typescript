@@ -25,11 +25,11 @@ export default class StatusBar {
   draw() {
     this.bar.clear();
     //  BG
-    this.bar.fillStyle(0xffffff);
+    this.bar.fillStyle(0x989898);
     this.bar.fillRect(this.x, this.y - 8, 32, 5);
 
     //  Health
-    this.bar.fillStyle(0xffffff);
+    this.bar.fillStyle(0x989898);
     this.bar.fillRect(this.x, this.y - 8, 32, 5);
 
     if (this.value / this.maxValue < 0.5 && this.value / this.maxValue > 0.3) {
@@ -37,7 +37,7 @@ export default class StatusBar {
     } else if (this.value / this.maxValue < 0.3) {
       this.bar.fillStyle(0xff0000);
     } else {
-      this.bar.fillStyle(0x00ff00);
+      this.bar.fillStyle(0x11C10E);
     }
 
     const hp = (this.value / this.maxValue) * 32;

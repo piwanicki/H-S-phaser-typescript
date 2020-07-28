@@ -47,6 +47,8 @@ const TILE_MAPPING = {
   PENTAGRAM: 2876,
   DUNG_ENTER: 2873,
   DUNG_ENTER2: 2885,
+  BLOOD: 3,
+  GREEN_BLOOD: 2
 };
 
 export default TILE_MAPPING;

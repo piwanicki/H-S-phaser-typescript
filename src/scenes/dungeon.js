@@ -27,15 +27,16 @@ export default class DungeonScene extends Phaser.Scene {
   enemies;
 
   preload() {
-    this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl.png");
+    this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
     this.load.image("dungeonTileset", "assets/tilemaps/Dungeon_Tileset.png");
-    this.load.image("dungeon2", "assets/tilemaps/dungeon.png");
+    this.load.image("dungeon2", "assets/tilemaps/dungeon_extruder.png");
     this.load.spritesheet("player", "assets/images/player/deep_elf_male.png", {
       frameWidth: 32,
       frameHeight: 32,
       margin: 0,
       spacing: 0,
     });
+
     this.load.spritesheet("tentacle", "assets/images/enemies/tentacle.png", {
       frameWidth: 32,
       frameHeight: 32,
@@ -43,7 +44,19 @@ export default class DungeonScene extends Phaser.Scene {
       spacing: 0,
     });
 
+    this.load.spritesheet(
+      "deadTentacle",
+      "assets/images/enemies/deadTentacle.png",
+      {
+        frameWidth: 32,
+        frameHeight: 32,
+        margin: 0,
+        spacing: 0,
+      }
+    );
+
     this.load.image("tentacleMissile", "assets/images/enemies/poison.png");
+    this.load.image("blood", "assets/images/player/blood.png");
   }
 
   addEnemyInRoom(x, y, sprite) {
@@ -88,16 +101,23 @@ export default class DungeonScene extends Phaser.Scene {
 
     const dungeonTileset = map.addTilesetImage(
       "dungeonTileset",
-      null,
+      "dungeonTileset",
       32,
       32,
       0,
       0
     );
-    const dungeon2 = map.addTilesetImage("dungeon2", null, 32, 32, 0, 0);
+    const dungeon2 = map.addTilesetImage("dungeon2", "dungeon2", 32, 32, 1, 2);
     this.groundLayer = map.createBlankDynamicLayer("groundLayer", dungeon2);
     this.wallsLayer = map.createBlankDynamicLayer("wallsLayer", dungeon2);
-    const tilesetStuff = map.addTilesetImage("dungeonSet", null, 32, 32, 0, 0);
+    const tilesetStuff = map.addTilesetImage(
+      "dungeonSet",
+      "dungeonSet",
+      32,
+      32,
+      1,
+      2
+    );
     this.stuffLayer = map.createBlankDynamicLayer("stuffLayer", tilesetStuff);
 
     this.dungeon.rooms.forEach((room) => {
@@ -206,8 +226,8 @@ export default class DungeonScene extends Phaser.Scene {
     });
 
     this.enemies.get(
-      this.player.sprite.x,
-      this.player.sprite.y + 50,
+      this.player.sprite.x + 46,
+      this.player.sprite.y + 82,
       "tentacle"
     );
 
@@ -314,11 +334,11 @@ export default class DungeonScene extends Phaser.Scene {
       this.player.sprite,
       this.enemies,
       (player, enemy) => {
-        const dmg = enemy.dealDamage();
-        const dx = this.player.sprite.x - enemy.x;
-        const dy = this.player.sprite.y - enemy.y;
-        const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(2000);
-        this.player.takeDamage(dmg, dir);
+        const dmg = enemy.dealPhysicalDamage();
+        //const dx = this.player.sprite.x - enemy.x;
+        //const dy = this.player.sprite.y - enemy.y;
+        //const dir = new Phaser.Math.Vector2(dx, dy).normalize().scale(2000);
+        this.player.takeDamage(dmg);
       }
     );
 
@@ -340,6 +360,8 @@ export default class DungeonScene extends Phaser.Scene {
     );
 
     this.physics.add.collider(this.wallsLayer, this.enemies);
+    this.physics.add.collider(this.stuffLayer, this.enemies);
+
     this.physics.add.collider(this.stuffLayer, this.enemies);
 
     // Phaser supports multiple cameras, but you can access the default camera like this:
@@ -409,6 +431,10 @@ export default class DungeonScene extends Phaser.Scene {
   update(time, delta) {
     if (this.levelComplete || this.backToSurface) return;
     this.player.update();
+
+    //const tentacleRoom = this.dungeon.getRoomAt(this.enemies, this.enemies);
+    //console.log(tentacleRoom)
+
     this.enemies.children.iterate((tentacle) => tentacle.update());
 
     // Find the player's room using another helper method from the dungeon that converts from dungeon XY (in grid units) to the corresponding room instance

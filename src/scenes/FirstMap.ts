@@ -19,7 +19,7 @@ export default class FirstMap extends Phaser.Scene {
     playerCursor; playerInDungeon;
     statusBar;
 
-    constructor() {
+    constructor() { 
         super("firstMap");
     }
 
@@ -28,7 +28,8 @@ export default class FirstMap extends Phaser.Scene {
         this.load.image("tree2", "assets/images/trees/tree_2_lightred.png");
         this.load.image("stone", "assets/images/stone.png");
         this.load.tilemapTiledJSON('map1', 'assets/tilemaps/Level1.json');
-        this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl.png");
+        this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
+        //this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl.png");
         this.load.spritesheet('player', 'assets/images/player/deep_elf_male.png', {
             frameWidth: 32,
             frameHeight: 32,
@@ -73,7 +74,7 @@ export default class FirstMap extends Phaser.Scene {
 
 
         const map = this.make.tilemap({ key: "map1" });
-        const tilesetMap = map.addTilesetImage('dungeonSet');
+        const tilesetMap = map.addTilesetImage('dungeonSet','dungeonSet', 32, 32, 1, 2);
         this.ground = map.createDynamicLayer("ground", tilesetMap, 0, 0);
         this.water = map.createDynamicLayer('water', tilesetMap, 0, 0);
         this.paths = map.createDynamicLayer('paths', tilesetMap, 0, 0);

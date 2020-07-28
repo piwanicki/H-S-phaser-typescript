@@ -7,6 +7,12 @@ const createTentacleAnims = (anims: Phaser.Animations.AnimationManager) => {
         frameRate: 2,
         repeat: -1,
     });
+
+    anims.create({
+        key: "deadTentacle",
+        frames: anims.generateFrameNames("deadTentacle", { start: 0, end: 3 }),
+        frameRate: 3,
+    });
 }
 
 export default createTentacleAnims;

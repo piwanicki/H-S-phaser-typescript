@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import PlayerCursor from "./playerCursor";
 import StatusBar from "../statusBar/statusBar";
-import Missile from "../attackMissile/missile";
 import MissileContainer from "../attackMissile/MissileContainer";
+import TILES from "../scenes/tileMapping";
 
 // /**
 //  * A class that wraps up our 2D platforming sprite logic. It creates, animates and moves a sprite in
@@ -18,6 +18,7 @@ export default class Player {
   attack = 12;
   strength = 3;
   damageTime = 300;
+  dead = false;
 
   constructor(scene, sprite, x, y, playerCursorSprite, map, scale = 1) {
     this.scene = scene;
@@ -30,7 +31,7 @@ export default class Player {
     this.missiles = scene.physics.add.group();
     this.map = map;
     this.inventory = {};
-    this.hp = 300;
+    this.hp = 200;
     this.hpBar = new StatusBar(
       this.scene,
       this.sprite.x,
@@ -118,7 +119,7 @@ export default class Player {
     return dmg;
   };
 
-  takeDamage = (dmg, dir) => {
+  takeDamage = (dmg) => {
     if (!dmg) return;
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
@@ -130,15 +131,9 @@ export default class Player {
     const body = this.sprite.body;
 
     // push back after took dmg
-    this.scene.physics.moveTo(this.sprite, dir.x, dir.y, 500);
-    this.hitTintDuration = this.scene.time.now + this.damageTime;
+    // this.scene.physics.moveTo(this.sprite, dir.x, dir.y, 500);
+    // this.hitTintDuration = this.scene.time.now + this.damageTime;
   };
-
-  damaged() {
-    if (this.hpBar.decrease(amount)) {
-      this.alive = false;
-    }
-  }
 
   freeze() {
     this.sprite.body.moves = false;
@@ -147,6 +142,10 @@ export default class Player {
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
+    if (this.dead) {
+      this.sprite.setTexture("blood");
+      return;
+    }
     const spriteSpeed = 750;
     const scene = this.scene;
 
@@ -155,7 +154,11 @@ export default class Player {
       sprite.setTint(0xffffff);
     }
 
-    if (scene.input.activePointer.isDown && scene.time.now > this.nextAttack) {
+    if (
+      scene.input.activePointer.isDown &&
+      scene.time.now > this.nextAttack &&
+      !this.dead
+    ) {
       this.attackHandler();
     }
     // Horizontal movement
@@ -221,7 +224,8 @@ export default class Player {
   }
 
   destroy() {
-    this.sprite.setActive(false).setVisible(false);
+    //this.sprite.setActive(false).setVisible(false);
     this.freeze();
+    this.dead = true;
   }
 }
