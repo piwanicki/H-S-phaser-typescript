@@ -27,39 +27,7 @@ export default class DungeonScene extends Phaser.Scene {
   tentacles;
   enemies;
 
-  preload() {
-    this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
-    this.load.image("dungeonTileset", "assets/tilemaps/Dungeon_Tileset.png");
-    this.load.image("dungeon2", "assets/tilemaps/dungeon_extruder.png");
-    this.load.spritesheet("player", "assets/images/player/deep_elf_male.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-      margin: 0,
-      spacing: 0,
-    });
-
-    this.load.spritesheet("tentacle", "assets/images/enemies/tentacle.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-      margin: 0,
-      spacing: 0,
-    });
-
-    this.load.spritesheet(
-      "deadTentacle",
-      "assets/images/enemies/deadTentacle.png",
-      {
-        frameWidth: 32,
-        frameHeight: 32,
-        margin: 0,
-        spacing: 0,
-      }
-    );
-
-    this.load.image("tentacleMissile", "assets/images/enemies/poison.png");
-    this.load.image("blood", "assets/images/player/blood.png");
-  }
-
+  
   addEnemyInRoom(x, y, sprite) {
     const enemy = this.enemies.get(x, y, sprite);
     // set active and visible

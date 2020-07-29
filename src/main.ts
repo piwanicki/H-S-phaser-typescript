@@ -16,7 +16,7 @@ const config: Phaser.Types.Core.GameConfig = {
 			debug: true
 		}
 	},
-	//scene: [FirstMap],
+	//scene: [LoadingScene],
 	//scene: [FirstMap, DungeonScene],
 	scene: [LoadingScene, MenuScene, FirstMap, DungeonScene],
 	//scene: [DungeonScene],

@@ -20,29 +20,7 @@ export default class FirstMap extends Phaser.Scene {
     statusBar;
 
     constructor() {
-        super("firstMap");
-    }
-
-    preload() {
-        this.load.image("tree1", "assets/images/trees/mangrove_2.png");
-        this.load.image("tree2", "assets/images/trees/tree_2_lightred.png");
-        this.load.image("stone", "assets/images/stone.png");
-        this.load.tilemapTiledJSON('map1', 'assets/tilemaps/Level1.json');
-        this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
-        //this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl.png");
-        this.load.spritesheet('player', 'assets/images/player/deep_elf_male.png', {
-            frameWidth: 32,
-            frameHeight: 32,
-            margin: 0,
-            spacing: 0
-        });
-        this.load.image('waterEdge-left', 'assets/images/waters/deep_water_wave_east.png')
-        this.load.image('waterEdge-right', 'assets/images/waters/deep_water_wave_west.png')
-        this.load.image('waterEdge-up', 'assets/images/waters/deep_water_wave_north.png')
-        this.load.image('waterEdge-down', 'assets/images/waters/deep_water_wave_south.png')
-        this.load.image('statusBar', 'assets/images/statusBar.png');
-        this.load.image('arrowMissile', 'assets/images/player/arrow.png');
-
+        super(scenesKeys.scenes.CITY);
     }
 
     enableDebugGraphics(layer) {
