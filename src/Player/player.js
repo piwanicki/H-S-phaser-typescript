@@ -51,6 +51,9 @@ export default class Player {
       D: D,
       S: S,
     });
+
+    this.hitSound = scene.sound.add("playerHit");
+    this.deadSound = scene.sound.add("playerDead");
   }
 
   preUpdate(time, delta) {
@@ -116,6 +119,8 @@ export default class Player {
       this.attack * this.strength * 1.2
     );
     this.hitWithMissile(missile);
+    this.hitSound.setVolume(0.2);
+    this.hitSound.play();
     return dmg;
   };
 
@@ -123,7 +128,8 @@ export default class Player {
     if (!dmg) return;
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
-    if (this.hp <= 0) {
+    if (this.hp <= 0 && !this.dead) {
+      this.deadSound.play();
       this.destroy();
       return;
     }

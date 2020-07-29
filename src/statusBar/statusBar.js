@@ -37,7 +37,7 @@ export default class StatusBar {
     } else if (this.value / this.maxValue < 0.3) {
       this.bar.fillStyle(0xff0000);
     } else {
-      this.bar.fillStyle(0x11C10E);
+      this.bar.fillStyle(0x11c10e);
     }
 
     const hp = (this.value / this.maxValue) * 32;

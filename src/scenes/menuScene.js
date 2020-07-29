@@ -26,8 +26,9 @@ export default class MenuScene extends Phaser.Scene {
     let scale = Math.max(scaleX, scaleY);
     backgroundImage.setScale(scale).setScrollFactor(0);
 
+    let music = this.sound.add("menuTheme2");
     this.sound.pauseOnBlur = false;
-    this.sound.play("menuTheme2");
+    music.play();
 
     // this.add.image(
     //   this.game.renderer.width / 2,
@@ -85,6 +86,7 @@ export default class MenuScene extends Phaser.Scene {
       this.cameras.main.fade(250, 0, 0, 0);
       this.cameras.main.once("camerafadeoutcomplete", () => {
         this.scene.start(scenesKeys.scenes.CITY);
+        music.pause();
       });
     });
 

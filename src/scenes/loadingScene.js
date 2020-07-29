@@ -27,13 +27,26 @@ export class LoadingScene extends Phaser.Scene {
     //this.load.image("gameNameLogo", "assets/images/menu_gameLogo.png");
     this.load.image("menuHoverPointer", "assets/images/menu_hoverPointer.png");
 
+
+
+
     // buttons
     // this.load.image('startBtn', 'assets/images/menu_background.png');
     // this.load.image('optionsBtn', 'assets/images/menu_background.png');
 
     // audio
     //this.load.audio('menuTheme', 'assets/audio/menu_theme.mp3');
-    this.load.audio('menuTheme2', 'assets/audio/menu_theme2.mp3');
+    this.load.audio("menuTheme2", "assets/audio/menu_theme2.mp3");
+    this.load.audio("cityTheme", "assets/audio/city_theme.mp3");
+    this.load.audio("dungeonTheme", "assets/audio/dungeon_theme.mp3");
+
+    // player 
+    this.load.audio('playerDead','assets/audio/player/dead.mp3')
+    this.load.audio('playerHit','assets/audio/player/hit.mp3') 
+
+    // enemy
+    this.load.audio('tentacleDead','assets/audio/enemies/tentacle/dead.mp3')
+    this.load.audio('tentacleHit','assets/audio/enemies/tentacle/hit.mp3')
 
     this.add.text(
       this.game.renderer.width * 0.45,
@@ -139,6 +152,7 @@ export class LoadingScene extends Phaser.Scene {
 
     this.load.on("complete", () => {
       this.scene.start(scenesKeys.scenes.MENU, "data to pass into next scene");
+     // this.scene.start(scenesKeys.scenes.DUNGEON, "data to pass into next scene");
     });
   }
 

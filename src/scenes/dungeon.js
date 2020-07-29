@@ -27,7 +27,6 @@ export default class DungeonScene extends Phaser.Scene {
   tentacles;
   enemies;
 
-  
   addEnemyInRoom(x, y, sprite) {
     const enemy = this.enemies.get(x, y, sprite);
     // set active and visible
@@ -60,6 +59,9 @@ export default class DungeonScene extends Phaser.Scene {
     this.backToSurface = false;
     createPlayerAnims(this.anims);
     createTentacleAnims(this.anims);
+
+    let music = this.sound.add("dungeonTheme");
+    music.play();
 
     // Generate a random world
     this.dungeon = new Dungeon({
@@ -372,6 +374,7 @@ export default class DungeonScene extends Phaser.Scene {
         this.player.freeze();
         camera.fade(250, 0, 0, 0);
         camera.once("camerafadeoutcomplete", () => {
+          music.pause();
           this.player.destroy();
           this.scene.restart();
         });
@@ -387,7 +390,8 @@ export default class DungeonScene extends Phaser.Scene {
           camera.fade(250, 0, 0, 0);
           camera.once("camerafadeoutcomplete", () => {
             this.player.destroy();
-            this.scene.start("firstMap");
+            this.scene.start(scenesKeys.scenes.CITY);
+            music.pause();
           });
         } else {
           this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
@@ -395,6 +399,7 @@ export default class DungeonScene extends Phaser.Scene {
           this.player.freeze();
           camera.fade(250, 0, 0, 0);
           camera.once("camerafadeoutcomplete", () => {
+            music.pause();
             this.player.destroy();
             this.scene.restart();
           });

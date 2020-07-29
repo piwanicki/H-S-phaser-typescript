@@ -50,6 +50,10 @@ export default class FirstMap extends Phaser.Scene {
         this.playerInDungeon = false;
         createPlayerAnims(this.anims);
 
+        let music = this.sound.add("cityTheme");
+        this.sound.pauseOnBlur = false;
+        music.play();
+
 
         const map = this.make.tilemap({ key: "map1" });
         const tilesetMap = map.addTilesetImage('dungeonSet', 'dungeonSet', 32, 32, 1, 2);
@@ -192,6 +196,7 @@ export default class FirstMap extends Phaser.Scene {
                 this.player.destroy();
                 this.scene.start(scenesKeys.scenes.DUNGEON);
                 this.playerInDungeon = true;
+                music.pause();
             });
         })
         // add tileIndex callback
@@ -204,6 +209,7 @@ export default class FirstMap extends Phaser.Scene {
                 this.player.destroy();
                 this.scene.start(scenesKeys.scenes.DUNGEON);
                 this.playerInDungeon = true;
+                music.pause();
             });
         })
     }

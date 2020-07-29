@@ -13,10 +13,10 @@ const config: Phaser.Types.Core.GameConfig = {
 		default: 'arcade',
 		arcade: {
 			gravity: { y: 0 },
-			debug: true
+			debug: false
 		}
 	},
-	//scene: [LoadingScene],
+	//scene: [LoadingScene, DungeonScene],
 	//scene: [FirstMap, DungeonScene],
 	scene: [LoadingScene, MenuScene, FirstMap, DungeonScene],
 	//scene: [DungeonScene],

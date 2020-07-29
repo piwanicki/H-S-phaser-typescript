@@ -25,6 +25,8 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
     private autoAttack;
     private range = 300;
     private dead = false;
+    private hitSound;
+    private deadSound;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | string) {
         super(scene, x, y, texture, frame);
@@ -57,6 +59,9 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.collider(this.missiles, scene.stuffLayer, (missile, stuffLayer) => {
             this.hitWithMissile(missile);
         })
+
+        this.hitSound = scene.sound.add('tentacleHit');
+        this.deadSound = scene.sound.add('tentacleDead');
     }
     private missileTileCollisionHandler(missile) {
         const dmg = this.dealDamage();
@@ -84,6 +89,7 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
         if (this.hp <= 0 && !this.dead) {
             this.dead = true;
             this.anims.play('deadTentacle');
+            this.deadSound.play();
             this.on('animationcomplete', (animation) => {
                 if (animation.key === 'deadTentacle') {
                     this.destroy();
@@ -129,6 +135,8 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
     private dealDamage() {
         const dmg = this.attack * this.level;
         const outDmg = Phaser.Math.Between(dmg, 1.2 * dmg)
+        this.hitSound.setVolume(.2);
+        this.hitSound.play();
         return outDmg;
     }
 
