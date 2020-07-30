@@ -4,5 +4,6 @@ export const scenesKeys = {
     MENU: "MENU",
     CITY: "CITY",
     DUNGEON: "DUNGEON",
+    GAME_UI: 'GAME_UI',
   },
 };

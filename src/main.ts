@@ -3,6 +3,7 @@ import FirstMap from './scenes/FirstMap';
 import DungeonScene from './scenes/dungeon';
 import { LoadingScene } from './scenes/loadingScene';
 import MenuScene from './scenes/menuScene';
+import GameUI from './scenes/gameUI';
 
 const config: Phaser.Types.Core.GameConfig = {
 	//const config = {
@@ -16,9 +17,10 @@ const config: Phaser.Types.Core.GameConfig = {
 			debug: false
 		}
 	},
+	scene: [GameUI],
 	//scene: [LoadingScene, DungeonScene],
 	//scene: [FirstMap, DungeonScene],
-	scene: [LoadingScene, MenuScene, FirstMap, DungeonScene],
+	//scene: [LoadingScene, MenuScene, FirstMap, DungeonScene],
 	//scene: [DungeonScene],
 	scale: {
 		mode: Phaser.Scale.FIT,
