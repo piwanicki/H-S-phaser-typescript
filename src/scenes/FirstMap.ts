@@ -4,6 +4,8 @@ import TILES from './tileMapping';
 import createPlayerAnims from '../anims/player-anims';
 import { scenesKeys } from './scenesKeys';
 
+
+
 export default class FirstMap extends Phaser.Scene {
     private background?: Phaser.GameObjects.TileSprite;
     private trees?: Phaser.Physics.Arcade.StaticGroup;
@@ -50,10 +52,12 @@ export default class FirstMap extends Phaser.Scene {
         this.playerInDungeon = false;
         createPlayerAnims(this.anims);
 
+
         let music = this.sound.add("cityTheme");
         this.sound.pauseOnBlur = false;
-        music.play();
+        //music.play();
 
+        this.scene.run(scenesKeys.scenes.GAME_UI)
 
         const map = this.make.tilemap({ key: "map1" });
         const tilesetMap = map.addTilesetImage('dungeonSet', 'dungeonSet', 32, 32, 1, 2);

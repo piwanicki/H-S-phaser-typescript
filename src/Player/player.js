@@ -4,6 +4,8 @@ import StatusBar from "../statusBar/statusBar";
 import MissileContainer from "../attackMissile/MissileContainer";
 import TILES from "../scenes/tileMapping";
 
+import eventsCenter from "../events/eventsCenter";
+
 // /**
 //  * A class that wraps up our 2D platforming sprite logic. It creates, animates and moves a sprite in
 //  * response to WSAD/arrow keys. Call its update method from the scene's update and call its destroy
@@ -76,6 +78,10 @@ export default class Player {
     //   this.scene.enemies,
     //   this.damageEnemy
     // );
+
+    // this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    //   this.input.keyboard.off("keydown_SPACE");
+    // });
   }
 
   attackHandler = () => {
@@ -154,7 +160,7 @@ export default class Player {
     }
     const spriteSpeed = 750;
     const scene = this.scene;
-
+    eventsCenter.emit("UI_update", this);
     //reset TinCollor
     if (this.scene.time.now > this.hitTintDuration) {
       sprite.setTint(0xffffff);
