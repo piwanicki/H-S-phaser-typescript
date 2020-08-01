@@ -7,7 +7,7 @@ export default class StatusBar {
     this.value = value;
     this.maxValue = value;
     scene.add.existing(this.bar);
-    this.draw();
+    this.drawMiniHPBar();
   }
 
   decrease(amount) {
@@ -19,10 +19,10 @@ export default class StatusBar {
       this.bar.destroy();
       return;
     }
-    this.draw();
+    this.drawMiniHPBar();
   }
 
-  draw() {
+  drawMiniHPBar() {
     this.bar.clear();
     //  BG
     this.bar.fillStyle(0x989898);
@@ -45,7 +45,7 @@ export default class StatusBar {
   }
 
   update(delta, time) {
-    this.draw();
+    this.drawMiniHPBar();
   }
 }
 
