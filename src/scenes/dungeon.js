@@ -62,7 +62,7 @@ export default class DungeonScene extends Phaser.Scene {
     createTentacleAnims(this.anims);
 
     let music = this.sound.add("dungeonTheme");
-    //music.play();
+    music.play();
 
     // Generate a random world
     this.dungeon = new Dungeon({

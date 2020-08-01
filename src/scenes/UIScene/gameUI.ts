@@ -8,6 +8,8 @@ export default class GameUI extends Phaser.Scene {
     private playerHPText;
     private player!: Player;
     private playerHPBar;
+    private playerMANABar;
+    private playerMANAText;
 
     constructor() {
         super({ key: scenesKeys.scenes.GAME_UI })
@@ -20,11 +22,12 @@ export default class GameUI extends Phaser.Scene {
     create() {
 
         this.playerHPBar = this.add.rectangle(0, 0, 250, 20, 0x11c10e);
+        this.playerMANABar = this.add.rectangle(0, 23, 250, 20, 0x2754f2);
         const playerUIcontainer = this.add.container(180, 50);
         playerUIcontainer.add(this.add.rectangle(0, 15, 250, 55, 0x989898))
         playerUIcontainer.add([
             this.playerHPBar,
-            this.add.rectangle(0, 23, 250, 20, 0x2754f2),
+            this.playerMANABar,
             this.add.rectangle(0, 45, 250, 5, 0xfdff0c),
         ])
 
@@ -34,30 +37,35 @@ export default class GameUI extends Phaser.Scene {
         // when it fires
         // clean up when Scene is shutdown
 
-        eventsCenter.on('UI_update', this.updateHpBar, this)
-
-
-
+        eventsCenter.on('UI_update', this.updatePlayersResources, this)
         this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
-            eventsCenter.off('UI_update', this.updateHpBar, this)
+            eventsCenter.off('UI_update', this.updatePlayersResources, this)
         })
 
         this.playerHPText = this.add.text(130, 42, '', { color: 'black', fontSize: 22 });
-
+        this.playerMANAText = this.add.text(135, 64, '', { color: 'black', fontSize: 20 });
     }
 
 
-    updateHpBar(player) {
-
-        const hpBar = this.playerHPBar;
-
+    updatePlayersResources = (player) => {
         this.player = player;
+        this.updateHpBar();
+        this.updateManaBar();
+    }
 
+
+    updateHpBar() {
+        const hpBar = this.playerHPBar;
         const playerHP = this.player.hp
-        this.playerHPText.text = `${playerHP} / ${this.player.hpBar.maxValue}`;
-        const p = playerHP / this.player.hpBar.maxValue;
+        let p;
+        if (playerHP > 0) {
+            this.playerHPText.text = `${playerHP} / ${this.player.hpBar.maxValue}`;
+            p = playerHP / this.player.hpBar.maxValue;
+        } else {
+            this.playerHPText.text = `0 / ${this.player.hpBar.maxValue}`
+            p = 0;
+        }
         hpBar.width = 250 * p;
-
         if (p < 0.5 && p > 0.3) {
             hpBar.fillColor = 0xffff00;
         } else if (p < 0.3) {
@@ -65,46 +73,23 @@ export default class GameUI extends Phaser.Scene {
         } else {
             hpBar.fillColor = 0x11c10e;
         }
-
     }
 
-
-    decrease(amount) {
-        this.playerHP -= amount;
-        if (this.playerHP < 0) {
-            this.playerHP = 0;
+    updateManaBar() {
+        const manaBar = this.playerMANABar;
+        const playerMANA = this.player.mana
+        let p;
+        if (playerMANA > 0) {
+            this.playerMANAText.text = `${playerMANA} / ${this.player.mana}`;
+            p = playerMANA / this.player.mana;
+        } else {
+            this.playerMANAText.text = `0 / ${this.player.mana}`
+            p = 0;
         }
-        if (this.playerHP === 0) {
-            this.playerHPBar.destroy();
-            return;
-        }
-        this.drawHPBar();
-    }
-
-    drawHPBar() {
-        const hpBar = this.playerHPBar;
-        hpBar.width = 30;
-        //  BG
-        // this.playerHPBar.fillStyle(0x989898);
-        // this.playerHPBar.fillRect(this.x, this.y - 8, 32, 5);
-        // 
-        //  Health
-        // this.bar.fillStyle(0x989898);
-        // this.playerHPBar.fillRect(this.x, this.y - 8, 32, 5);
-        // 
-        // if (this.playerHP / this.player.hpBar.maxValue < 0.5 && this.playerHP / this.player.hpBar.maxValue > 0.3) {
-        //   this.playerHPBar.fillStyle(0xffff00);
-        // } else if (this.playerHP / this.player.hpBar.maxValue < 0.3) {
-        //   this.playerHPBar.fillStyle(0xff0000);
-        // } else {
-        //   this.playerHPBar.fillStyle(0x11c10e);
-        // }
-        // 
-        // const hp = (this.playerHP / this.player.hpBar.maxValue) * 32;
-        // this.playerHPBar.fillRect(this.x, this.y - 8, hp, 5);
+        manaBar.width = 250 * p;
     }
 
     update(delta, time) {
-        this.drawHPBar();
+
     }
 }

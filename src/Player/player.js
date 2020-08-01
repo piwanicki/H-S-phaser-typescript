@@ -34,6 +34,7 @@ export default class Player {
     this.map = map;
     this.inventory = {};
     this.hp = 200;
+    this.mana = 100;
     this.hpBar = new StatusBar(
       this.scene,
       this.sprite.x,
@@ -154,13 +155,14 @@ export default class Player {
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
+    eventsCenter.emit("UI_update", this);
     if (this.dead) {
       this.sprite.setTexture("blood");
       return;
     }
     const spriteSpeed = 750;
     const scene = this.scene;
-    eventsCenter.emit("UI_update", this);
+
     //reset TinCollor
     if (this.scene.time.now > this.hitTintDuration) {
       sprite.setTint(0xffffff);
