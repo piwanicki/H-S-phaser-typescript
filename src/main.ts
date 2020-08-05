@@ -4,6 +4,7 @@ import DungeonScene from './scenes/dungeon';
 import { LoadingScene } from './scenes/loadingScene';
 import MenuScene from './scenes/menuScene';
 import GameUI from './scenes/UIScene/gameUI';
+import testScene from './scenes/testScene';
 
 const config: Phaser.Types.Core.GameConfig = {
 	//const config = {
@@ -14,11 +15,11 @@ const config: Phaser.Types.Core.GameConfig = {
 		default: 'arcade',
 		arcade: {
 			gravity: { y: 0 },
-			debug: false
+			debug: true
 		}
 	},
 	//scene: [GameUI],
-	//scene: [LoadingScene, DungeonScene],
+	//scene: [LoadingScene, testScene],
 	//scene: [FirstMap, DungeonScene],
 	scene: [LoadingScene, MenuScene, FirstMap, DungeonScene,GameUI],
 	//scene: [DungeonScene],

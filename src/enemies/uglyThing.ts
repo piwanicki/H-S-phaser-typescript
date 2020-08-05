@@ -45,30 +45,12 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
 
         this.hpBar = new StatusBar(scene, x, y, this.hp)
         const gameObject = scene.physics.add.existing(this);
-        // this.missiles = this.scene.physics.add.group({
-        //     classType: MissileContainer,
-        // });
-
-        // scene.physics.add.overlap(this.missiles, scene.player.sprite, (player, missile) => {
-        //     this.missileTileCollisionHandler(missile, player)
-        // });
-        // scene.physics.add.collider(this.missiles, scene.wallsLayer, (missile, wallsLayer) => {
-        //     this.hitWithMissile(missile);
-        // })
-        // scene.physics.add.collider(this.missiles, scene.stuffLayer, (missile, stuffLayer) => {
-        //     this.hitWithMissile(missile);
-        // })
+        scene.physics.add.collider(gameObject, scene.wallsLayer)
+        scene.physics.add.collider(gameObject, scene.stuffLayer)
 
         this.hitSound = scene.sound.add('tentacleHit');
         this.deadSound = scene.sound.add('tentacleDead');
     }
-
-    // private missileTileCollisionHandler(missile) {
-    //     const dmg = this.dealDamage();
-    //     this.scene.player.takeDamage(dmg);
-    //     this.hitWithMissile(missile);
-    //     return;
-    // }
 
     // private tileCollisionHandler(gameObj: Phaser.GameObjects.GameObject, tile: Phaser.Tilemaps.Tile) {
     //     if (gameObj !== this) return;
@@ -102,10 +84,6 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    // private hitWithMissile = (missile) => {
-    //     missile.destroy();
-    // };
-
     private createFloatingText(x, y, message, tint, font) {
         //let animation = this.scene.add.bitmapText(x, y, font, message).setTint(tint);
         let animation = this.scene.add.text(x, y, message, { fontSize: 12 })
@@ -127,35 +105,11 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
             const [playerX, playerY] = [player.sprite.body.center.x, player.sprite.body.center.y];
             const distanceFromPlayer = Phaser.Math.Distance.Between(this.x, this.y, playerX, playerY)
             if (this.scene.time.now >= this.nextAttack && distanceFromPlayer <= this.range) {
-
-                // this.missile = new MissileContainer(
-                //     this.scene,
-                //     this.x,
-                //     this.y,
-                //     "tentacleMissile"
-                // );
-
-                // const angle = Phaser.Math.Angle.Between(
-                //     this.x,
-                //     this.y,
-                //     player.sprite.body.x + this.scene.cameras.main.scrollX,
-                //     player.sprite.body.x + this.scene.cameras.main.scrollY
-                // );
-                // this.missiles.add(this.missile, false);
-                // this.missile.angle = angle * 57.29;
                 this.scene.physics.moveTo(this, player.sprite.body.center.x, player.sprite.body.center.y, 200);
                 this.nextAttack = this.scene.time.now + this.fireRate;
             }
         }
     }
-
-    // private dealDamage() {
-    //     const dmg = this.attack * this.level;
-    //     const outDmg = Phaser.Math.Between(dmg, 1.2 * dmg)
-    //     this.hitSound.setVolume(.2);
-    //     this.hitSound.play();
-    //     return outDmg;
-    // }
 
     private dealPhysicalDamage() {
         if (this.scene.time.now >= this.scene.time.now + this.nextPhysicalAttack) {
