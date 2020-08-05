@@ -131,8 +131,30 @@ export default class Player {
     return dmg;
   };
 
+  createFloatingText(x, y, message, tint, font) {
+    //let animation = this.scene.add.bitmapText(x, y, font, message).setTint(tint);
+    let animation = this.scene.add.text(x, y, message,{fontSize: 12})
+    let tween = this.scene.add.tween({
+      targets: animation,
+      duration: 750,
+      ease: "Exponential.In",
+      y: y - 30,
+      onComplete: () => {
+        animation.destroy();
+      },
+      callbackScope: this,
+    });
+  }
+
   takeDamage = (dmg) => {
     if (!dmg) return;
+    this.createFloatingText(
+      this.sprite.body.x+8,
+      this.sprite.body.center.y - 30,
+      dmg,
+      0x000000,
+      "doomed"
+    );
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
     if (this.hp <= 0 && !this.dead) {

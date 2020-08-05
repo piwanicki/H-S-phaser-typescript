@@ -27,9 +27,6 @@ export class LoadingScene extends Phaser.Scene {
     //this.load.image("gameNameLogo", "assets/images/menu_gameLogo.png");
     this.load.image("menuHoverPointer", "assets/images/menu_hoverPointer.png");
 
-
-
-
     // buttons
     // this.load.image('startBtn', 'assets/images/menu_background.png');
     // this.load.image('optionsBtn', 'assets/images/menu_background.png');
@@ -40,13 +37,13 @@ export class LoadingScene extends Phaser.Scene {
     this.load.audio("cityTheme", "assets/audio/city_theme.mp3");
     this.load.audio("dungeonTheme", "assets/audio/dungeon_theme.mp3");
 
-    // player 
-    this.load.audio('playerDead','assets/audio/player/dead.mp3')
-    this.load.audio('playerHit','assets/audio/player/hit.mp3') 
+    // player
+    this.load.audio("playerDead", "assets/audio/player/dead.mp3");
+    this.load.audio("playerHit", "assets/audio/player/hit.mp3");
 
     // enemy
-    this.load.audio('tentacleDead','assets/audio/enemies/tentacle/dead.mp3')
-    this.load.audio('tentacleHit','assets/audio/enemies/tentacle/hit.mp3')
+    this.load.audio("tentacleDead", "assets/audio/enemies/tentacle/dead.mp3");
+    this.load.audio("tentacleHit", "assets/audio/enemies/tentacle/hit.mp3");
 
     this.add.text(
       this.game.renderer.width * 0.45,
@@ -120,6 +117,7 @@ export class LoadingScene extends Phaser.Scene {
       spacing: 0,
     });
 
+    // tentacle
     this.load.spritesheet("tentacle", "assets/images/enemies/tentacle.png", {
       frameWidth: 32,
       frameHeight: 32,
@@ -139,6 +137,15 @@ export class LoadingScene extends Phaser.Scene {
     );
 
     this.load.image("tentacleMissile", "assets/images/enemies/poison.png");
+
+    // uglyThing
+    this.load.spritesheet("uglyThing", "assets/images/enemies/ugly_thing.png", {
+      frameWidth: 32,
+      frameHeight: 32,
+      margin: 0,
+      spacing: 0,
+    });
+
     this.load.image("blood", "assets/images/player/blood.png");
 
     this.load.on("progress", (percent) => {
@@ -152,7 +159,7 @@ export class LoadingScene extends Phaser.Scene {
 
     this.load.on("complete", () => {
       this.scene.start(scenesKeys.scenes.MENU, "data to pass into next scene");
-     // this.scene.start(scenesKeys.scenes.DUNGEON, "data to pass into next scene");
+      // this.scene.start(scenesKeys.scenes.DUNGEON, "data to pass into next scene");
     });
   }
 

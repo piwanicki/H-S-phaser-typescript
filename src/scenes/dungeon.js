@@ -3,9 +3,11 @@ import Dungeon from "@mikewesthad/dungeon";
 import Player from "../Player/player";
 import TILES from "./tileMapping";
 import TilemapVisibility from "./tilemapVisibility";
-import Tentacle from "~/enemies/tentacle";
+import Tentacle from "../enemies/tentacle";
+import UglyThing from "../enemies/uglyThing";
 import createTentacleAnims from "../anims/tentacle-anims";
 import createPlayerAnims from "../anims/player-anims";
+import createUglyThingAnims from "../anims/uglyThing-anims";
 import {scenesKeys} from "./scenesKeys";
 import eventsCenter from "../events/eventsCenter";
 
@@ -60,9 +62,10 @@ export default class DungeonScene extends Phaser.Scene {
     this.backToSurface = false;
     createPlayerAnims(this.anims);
     createTentacleAnims(this.anims);
+    createUglyThingAnims(this.anims);
 
     let music = this.sound.add("dungeonTheme");
-    music.play();
+    //music.play();
 
     // Generate a random world
     this.dungeon = new Dungeon({
@@ -202,6 +205,23 @@ export default class DungeonScene extends Phaser.Scene {
       0
     );
 
+    // this.enemies = this.physics.add.group([
+    //   {
+    //     classType: Tentacle,
+    //     createCallback: (gameObj) => {
+    //       const tentacleObj = gameObj;
+    //       tentacleObj.body.onCollide = true;
+    //     },
+    //   },
+    //   {
+    //     classType: UglyThing,
+    //     createCallback: (gameObj) => {
+    //       const uglyThingObj = gameObj;
+    //       uglyThingObj.body.onCollide = true;
+    //     }
+    //   }
+    // ]);
+
     this.enemies = this.physics.add.group({
       classType: Tentacle,
       createCallback: (gameObj) => {
@@ -210,11 +230,27 @@ export default class DungeonScene extends Phaser.Scene {
       },
     });
 
+    // this.enemies = this.physics.add.group({
+    //   classType: UglyThing,
+    //   createCallback: (gameObj) => {
+    //     const tentacleObj = gameObj;
+    //     tentacleObj.body.onCollide = true;
+    //   },
+    // });
+
     this.enemies.get(
       this.player.sprite.x + 46,
       this.player.sprite.y + 82,
       "tentacle"
     );
+
+    // this.enemies.get(
+    //   this.player.sprite.x + 86,
+    //   this.player.sprite.y + 22,
+    //   "uglyThing"
+    // );
+
+    console.log(this.enemies);
 
     // Place stuffLayer in the 90% "otherRooms"
     otherRooms.forEach((room) => {
@@ -421,12 +457,20 @@ export default class DungeonScene extends Phaser.Scene {
     //const tentacleRoom = this.dungeon.getRoomAt(this.enemies, this.enemies);
     //console.log(tentacleRoom)
 
-    this.enemies.children.iterate((tentacle) => tentacle.update());
-
     // Find the player's room using another helper method from the dungeon that converts from dungeon XY (in grid units) to the corresponding room instance
     const playerTileX = this.groundLayer.worldToTileX(this.player.sprite.x);
     const playerTileY = this.groundLayer.worldToTileY(this.player.sprite.y);
     const playerRoom = this.dungeon.getRoomAt(playerTileX, playerTileY);
     this.tilemapVisibility.setActiveRoom(playerRoom);
+
+    // Update enemy only when player is in the room
+    this.enemies.children.iterate((tentacle) => {
+      const enemyTileX = this.groundLayer.worldToTileX(tentacle.x);
+      const enemyTileY = this.groundLayer.worldToTileY(tentacle.y);
+      const enemyRoom = this.dungeon.getRoomAt(enemyTileX, enemyTileY);
+      if (enemyRoom === playerRoom) {
+        tentacle.update();
+      }
+    });
   }
 }

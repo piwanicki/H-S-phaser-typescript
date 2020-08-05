@@ -47,6 +47,17 @@ export default class GameUI extends Phaser.Scene {
     }
 
 
+    createFloatingText(x, y, message, tint, font) {
+        let animation = this.add.bitmapText(x, y, font, message).setTint(tint);
+        let tween: Phaser.Tweens.Tween = this.add.tween({
+            targets: animation, duration: 750, ease: 'Exponential.In', y: y - 50,
+            onComplete: () => {
+                animation.destroy();
+            }, callbackScope: this
+        });
+    }
+
+
     updatePlayersResources = (player) => {
         this.player = player;
         this.updateHpBar();
