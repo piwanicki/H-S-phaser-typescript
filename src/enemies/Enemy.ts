@@ -1,39 +1,36 @@
 import Phaser from 'phaser';
 import StatusBar from '~/statusBar/StatusBar';
 import MissileContainer from '../attackMissile/MissileContainer';
-import TILES from '../scenes/tileMapping';
-import {createFloatingText} from '../scenes/UIScene/UIFunctions';
+import { createFloatingText } from '../scenes/UIScene/UIFunctions';
 
 enum Direction {
     UP, DOWN, LEFT, RIGHT
 }
 
+export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
-
-    //private speed = 100;
-    private hp = 200;
-    private direction = Direction.UP;
+    private speed;
+    private hp;
+    private direction;
     private moveEvent?: Phaser.Time.TimerEvent;
     private hpBar: StatusBar;
-    private attack = 20;
-    private level = 1;
-    private fireRate = 1000;
-    private nextAttack = 0;
-    private nextPhysicalAttack = 0;
+    private attack;
+    private level;
+    private fireRate;
+    private nextAttack;
+    private nextPhysicalAttack;
     private missiles;
     private missile;
     private autoAttack;
-    private range = 300;
+    private range;
     private dead = false;
     private hitSound;
     private deadSound;
-    private exp = this.level * 20;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | string) {
         super(scene, x, y, texture, frame);
-        this.anims.play('tentacle-anim');
-        scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_COLLIDE, this.dealPhysicalDamage, this)
+        //this.anims.play('tentacle-anim');
+        //scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_COLLIDE, this.dealPhysicalDamage, this)
 
         // this.moveEvent = scene.time.addEvent({
         //     //delay: 1000,
@@ -45,23 +42,23 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
         //     //}
         // })
 
-        this.hpBar = new StatusBar(scene, x, y, this.hp)
+        //this.hpBar = new StatusBar(scene, x, y, this.hp)
         const gameObject = scene.physics.add.existing(this);
-        gameObject.body.moves = false;
+        //gameObject.body.moves = false;
 
         this.missiles = this.scene.physics.add.group({
             classType: MissileContainer,
         });
 
-        scene.physics.add.overlap(this.missiles, scene.player.sprite, (player, missile) => {
-            this.missileTileCollisionHandler(missile, player)
-        });
-        scene.physics.add.collider(this.missiles, scene.wallsLayer, (missile) => {
-            this.hitWithMissile(missile);
-        })
-        scene.physics.add.collider(this.missiles, scene.stuffLayer, (missile) => {
-            this.hitWithMissile(missile);
-        })
+        // scene.physics.add.overlap(this.missiles, scene.player.sprite, (player, missile) => {
+        //     this.missileTileCollisionHandler(missile, player)
+        // });
+        // scene.physics.add.collider(this.missiles, scene.wallsLayer, (missile) => {
+        //     this.hitWithMissile(missile);
+        // })
+        // scene.physics.add.collider(this.missiles, scene.stuffLayer, (missile) => {
+        //     this.hitWithMissile(missile);
+        // })
 
         this.hitSound = scene.sound.add('tentacleHit');
         this.deadSound = scene.sound.add('tentacleDead');
@@ -89,19 +86,20 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
     private takeDamage(dmg: number) {
         this.hp -= dmg;
         this.hpBar.decrease(dmg);
-        createFloatingText(this.scene,this.x - 8, this.y - 30, dmg, 0xFFFFFF, null);
+        createFloatingText(this.x - 8, this.y - 30, dmg, null, null);
         if (this.hp <= 0 && !this.dead) {
             this.dead = true;
             this.anims.play('deadTentacle');
             this.deadSound.play();
             this.on('animationcomplete', (animation) => {
                 if (animation.key === 'deadTentacle') {
-                    this.scene.player.updatePlayerExp(this.exp);
                     this.destroy();
                 }
             });
             //this.on('animationcomplete', this.destroy)
             //this.scene.stuffLayer.putTileAtWorldXY(TILES.GREEN_BLOOD, this.x, this.y)
+
+
         }
     }
 
@@ -109,8 +107,24 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
         missile.destroy();
     };
 
+    // private createFloatingText(x, y, message, tint, font) {
+    //     //let animation = this.scene.add.bitmapText(x, y, font, message).setTint(tint);
+    //     let animation = this.scene.add.text(x, y, message, { fontSize: 12 })
+    //     let tween = this.scene.add.tween({
+    //         targets: animation,
+    //         duration: 750,
+    //         ease: "Exponential.In",
+    //         y: y - 30,
+    //         onComplete: () => {
+    //             animation.destroy();
+    //         },
+    //         callbackScope: this,
+    //     });
+    // }
+
     private autoAttackHandler() {
         if (this.scene.time.now >= this.nextAttack) {
+
             const player = this.scene.player;
             const [playerX, playerY] = [player.sprite.body.center.x, player.sprite.body.center.y];
             const distanceFromPlayer = Phaser.Math.Distance.Between(this.x, this.y, playerX, playerY)
@@ -180,7 +194,6 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
         this.hpBar.x = this.body.position.x;
         this.hpBar.y = this.body.position.y;
         this.hpBar.update(time, delta);
-        if (!this.scene.player.dead) this.autoAttackHandler();
     }
 
     destroy(fromScene?: boolean) {

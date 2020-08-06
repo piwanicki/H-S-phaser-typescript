@@ -1,10 +1,10 @@
 import Phaser from "phaser";
 import Dungeon from "@mikewesthad/dungeon";
-import Player from "../Player/player";
+import Player from "../Player/Player";
 import TILES from "./tileMapping";
-import TilemapVisibility from "./tilemapVisibility";
-import Tentacle from "../enemies/tentacle";
-import UglyThing from "../enemies/uglyThing";
+import TilemapVisibility from "./TilemapVisibility";
+import Tentacle from "../enemies/Tentacle";
+import UglyThing from "../enemies/UglyThing";
 import createTentacleAnims from "../anims/tentacle-anims";
 import createPlayerAnims from "../anims/player-anims";
 import createUglyThingAnims from "../anims/uglyThing-anims";
@@ -69,7 +69,7 @@ export default class DungeonScene extends Phaser.Scene {
     createUglyThingAnims(this.anims);
 
     let music = this.sound.add("dungeonTheme");
-    //music.play();
+    music.play();
 
     // Generate a random world
     this.dungeon = new Dungeon({
@@ -225,11 +225,9 @@ export default class DungeonScene extends Phaser.Scene {
         room.centerX,
         room.centerY
       );
-
       if (rand <= 0.05) {
         // 5% chance of chest
         this.stuffLayer.putTileAt(TILES.HP, room.centerX, room.centerY);
-        console.log(`hp`);
         const tentacle = new Tentacle(
           this,
           roomCenterOnWorldMap.x + 50,
@@ -261,11 +259,9 @@ export default class DungeonScene extends Phaser.Scene {
           "uglyThing"
         );
         this.addEnemyInRoom(uglyThing);
-        console.log(`mana`);
       } else if (rand <= 0.25) {
         // 25% chance of chest
         this.stuffLayer.putTileAt(TILES.CHEST, room.centerX, room.centerY);
-        console.log(`chest`);
         const tentacle = new Tentacle(
           this,
           roomCenterOnWorldMap.x + 50,
@@ -285,7 +281,6 @@ export default class DungeonScene extends Phaser.Scene {
         const x = Phaser.Math.Between(room.left + 2, room.right - 2);
         const y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
         this.stuffLayer.putTileAt(TILES.PENTAGRAM, x, y);
-        console.log(`tower`);
         const tentacle = new Tentacle(
           this,
           roomCenterOnWorldMap.x + 50,
@@ -324,11 +319,20 @@ export default class DungeonScene extends Phaser.Scene {
             room.centerX + 1,
             room.centerY + 1
           );
-          // this.addEnemyInRoom(
-          //   roomCenterOnWorldMap.x,
-          //   roomCenterOnWorldMap.y,
-          //   "tentacle"
-          // );
+          const tentacle = new Tentacle(
+            this,
+            roomCenterOnWorldMap.x + 80,
+            roomCenterOnWorldMap.y + 50,
+            "tentacle"
+          );
+          this.addEnemyInRoom(tentacle);
+          const uglyThing = new UglyThing(
+            this,
+            roomCenterOnWorldMap.x - 50,
+            roomCenterOnWorldMap.y,
+            "uglyThing"
+          );
+          this.addEnemyInRoom(uglyThing);
         } else {
           this.stuffLayer.putTileAt(
             TILES.STATUE_1,
@@ -342,11 +346,10 @@ export default class DungeonScene extends Phaser.Scene {
           );
           const tentacle = new Tentacle(
             this,
-            roomCenterOnWorldMap.x + 50,
+            roomCenterOnWorldMap.x + 80,
             roomCenterOnWorldMap.y + 50,
             "tentacle"
           );
-          this.addEnemyInRoom(tentacle);
           const uglyThing = new UglyThing(
             this,
             roomCenterOnWorldMap.x + 100,
@@ -354,6 +357,7 @@ export default class DungeonScene extends Phaser.Scene {
             "uglyThing"
           );
           this.addEnemyInRoom(uglyThing);
+          this.addEnemyInRoom(tentacle);
         }
       }
     });
@@ -365,7 +369,6 @@ export default class DungeonScene extends Phaser.Scene {
       this.player.sprite,
       this.enemies,
       (player, enemy) => {
-        console.log(overlap);
         this.enemyCollisionDmgHandler(enemy);
       }
     );

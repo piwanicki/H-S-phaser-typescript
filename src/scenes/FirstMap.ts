@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import Player from '../Player/player';
+import Player from '../Player/Player';
 import TILES from './tileMapping';
 import createPlayerAnims from '../anims/player-anims';
 import { scenesKeys } from './scenesKeys';
@@ -55,7 +55,7 @@ export default class FirstMap extends Phaser.Scene {
 
         let music = this.sound.add("cityTheme");
         this.sound.pauseOnBlur = false;
-        //music.play();
+        music.play();
 
         this.scene.run(scenesKeys.scenes.GAME_UI)
 

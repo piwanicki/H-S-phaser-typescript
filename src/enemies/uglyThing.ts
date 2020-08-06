@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
-import StatusBar from '~/statusBar/statusBar';
+import StatusBar from '~/statusBar/StatusBar';
 import MissileContainer from '../attackMissile/MissileContainer';
 import TILES from '../scenes/tileMapping';
+import { createFloatingText } from '../scenes/UIScene/UIFunctions';
+import eventsCenter from '~/events/eventsCenter';
 
 enum Direction {
     UP, DOWN, LEFT, RIGHT
@@ -18,20 +20,20 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
     private attack = 30;
     private level = 1;
     private fireRate = 800;
-    private nextAttack = 0;
     private nextPhysicalAttack = 0;
     // private missiles;
     // private missile;
     private autoAttack;
-    private range = 10;
+    private range = 20;
     private dead = false;
     private hitSound;
     private deadSound;
+    private exp = this.level * 30;
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | string) {
         super(scene, x, y, texture, frame);
         this.anims.play('uglyThing-anim');
-        scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_COLLIDE, this.dealPhysicalDamage, this)
+        //scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_OVERLAP, this.dealPhysicalDamage, this)
 
         // this.moveEvent = scene.time.addEvent({
         //     //delay: 1000,
@@ -68,54 +70,31 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
     private takeDamage(dmg: number) {
         this.hp -= dmg;
         this.hpBar.decrease(dmg);
-        this.createFloatingText(this.x - 8, this.y - 30, dmg, null, null);
+        createFloatingText(this.scene, this.x - 8, this.y - 30, dmg, 0xFFFFFF, null);
         if (this.hp <= 0 && !this.dead) {
             this.dead = true;
             this.anims.play('deadTentacle');
             this.deadSound.play();
             this.on('animationcomplete', (animation) => {
                 if (animation.key === 'deadTentacle') {
+                    this.scene.player.updatePlayerExp(this.exp);
                     this.destroy();
                 }
             });
             //this.on('animationcomplete', this.destroy)
             //this.scene.stuffLayer.putTileAtWorldXY(TILES.GREEN_BLOOD, this.x, this.y)
-
-        }
-    }
-
-    private createFloatingText(x, y, message, tint, font) {
-        //let animation = this.scene.add.bitmapText(x, y, font, message).setTint(tint);
-        let animation = this.scene.add.text(x, y, message, { fontSize: 12 })
-        let tween = this.scene.add.tween({
-            targets: animation,
-            duration: 750,
-            ease: "Exponential.In",
-            y: y - 30,
-            onComplete: () => {
-                animation.destroy();
-            },
-            callbackScope: this,
-        });
-    }
-
-    private autoAttackHandler() {
-        if (this.scene.time.now >= this.nextAttack) {
-            const player = this.scene.player;
-            const [playerX, playerY] = [player.sprite.body.center.x, player.sprite.body.center.y];
-            const distanceFromPlayer = Phaser.Math.Distance.Between(this.x, this.y, playerX, playerY)
-            if (this.scene.time.now >= this.nextAttack && distanceFromPlayer <= this.range) {
-                this.scene.physics.moveTo(this, player.sprite.body.center.x, player.sprite.body.center.y, 200);
-                this.nextAttack = this.scene.time.now + this.fireRate;
-            }
         }
     }
 
     private dealPhysicalDamage() {
-        if (this.scene.time.now >= this.scene.time.now + this.nextPhysicalAttack) {
+        const player = this.scene.player;
+        const [playerX, playerY] = [player.sprite.body.center.x, player.sprite.body.center.y];
+        const distanceFromPlayer = Phaser.Math.Distance.Between(this.x, this.y, playerX, playerY)
+
+        if (this.scene.time.now >= this.nextPhysicalAttack && distanceFromPlayer <= this.range && !player.dead) {
+            this.nextPhysicalAttack = this.scene.time.now + this.fireRate;
             const dmg = this.attack * this.level;
             const outDmg = Phaser.Math.Between(dmg, 1.2 * dmg)
-            this.nextPhysicalAttack = this.scene.time.now + this.fireRate;
             return outDmg;
         }
     }
@@ -143,11 +122,15 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(time: number, delta: number) {
-        if (this.dead) return;
+        const player = this.scene.player;
+        if (this.dead || player.dead) {
+            this.body.moves = false;
+            return
+        };
+        this.scene.physics.moveTo(this, player.sprite.body.center.x, player.sprite.body.center.y, 100);
         this.hpBar.x = this.body.position.x;
         this.hpBar.y = this.body.position.y;
         this.hpBar.update(time, delta);
-        if (!this.scene.player.dead) this.autoAttackHandler();
     }
 
     destroy(fromScene?: boolean) {

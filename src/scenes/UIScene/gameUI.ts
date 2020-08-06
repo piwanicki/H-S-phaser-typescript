@@ -1,7 +1,8 @@
 import { scenesKeys } from '../scenesKeys';
 import eventsCenter from '../../events/eventsCenter';
-import StatusBar from '~/statusBar/statusBar';
-import Player from '~/Player/player';
+import StatusBar from '~/statusBar/StatusBar';
+import Player from '~/Player/Player';
+import createUglyThingAnims from '~/anims/uglyThing-anims';
 
 export default class GameUI extends Phaser.Scene {
     private playerHP!: number;
@@ -10,6 +11,7 @@ export default class GameUI extends Phaser.Scene {
     private playerHPBar;
     private playerMANABar;
     private playerMANAText;
+    private playerExpBar;
 
     constructor() {
         super({ key: scenesKeys.scenes.GAME_UI })
@@ -23,12 +25,13 @@ export default class GameUI extends Phaser.Scene {
 
         this.playerHPBar = this.add.rectangle(0, 0, 250, 20, 0x11c10e);
         this.playerMANABar = this.add.rectangle(0, 23, 250, 20, 0x2754f2);
+        this.playerExpBar = this.add.rectangle(0, 45, 250, 5, 0xfdff0c);
         const playerUIcontainer = this.add.container(180, 50);
         playerUIcontainer.add(this.add.rectangle(0, 15, 250, 55, 0x989898))
         playerUIcontainer.add([
             this.playerHPBar,
             this.playerMANABar,
-            this.add.rectangle(0, 45, 250, 5, 0xfdff0c),
+            this.playerExpBar
         ])
 
         this.physics.add.existing(playerUIcontainer);
@@ -46,22 +49,19 @@ export default class GameUI extends Phaser.Scene {
         this.playerMANAText = this.add.text(135, 64, '', { color: 'black', fontSize: 20 });
     }
 
-
-    createFloatingText(x, y, message, tint, font) {
-        let animation = this.add.bitmapText(x, y, font, message).setTint(tint);
-        let tween: Phaser.Tweens.Tween = this.add.tween({
-            targets: animation, duration: 750, ease: 'Exponential.In', y: y - 50,
-            onComplete: () => {
-                animation.destroy();
-            }, callbackScope: this
-        });
-    }
-
-
     updatePlayersResources = (player) => {
         this.player = player;
         this.updateHpBar();
         this.updateManaBar();
+        this.updateExpBar();
+    }
+
+    updateExpBar() {
+        const playerExp = this.player.exp;
+        const playerNextLvlExp = this.player.nextLevelExp;
+        const expBar = this.playerExpBar;
+        let p = playerExp / playerNextLvlExp;
+        expBar.width = 250 * p;
     }
 
 

@@ -1,8 +1,9 @@
 import Phaser from "phaser";
-import PlayerCursor from "./playerCursor";
-import StatusBar from "../statusBar/statusBar";
+import PlayerCursor from "./PlayerCursor";
+import StatusBar from "../statusBar/StatusBar";
 import MissileContainer from "../attackMissile/MissileContainer";
 import TILES from "../scenes/tileMapping";
+import {createFloatingText} from "../scenes/UIScene/UIFunctions";
 
 import eventsCenter from "../events/eventsCenter";
 
@@ -21,6 +22,9 @@ export default class Player {
   strength = 3;
   damageTime = 300;
   dead = false;
+  level = 1;
+  exp = 0;
+  nextLevelExp = 100 * (this.level * Math.pow(this.level, 2));
 
   constructor(scene, sprite, x, y, playerCursorSprite, map, scale = 1) {
     this.scene = scene;
@@ -131,29 +135,14 @@ export default class Player {
     return dmg;
   };
 
-  createFloatingText(x, y, message, tint, font) {
-    //let animation = this.scene.add.bitmapText(x, y, font, message).setTint(tint);
-    let animation = this.scene.add.text(x, y, message,{fontSize: 12})
-    let tween = this.scene.add.tween({
-      targets: animation,
-      duration: 750,
-      ease: "Exponential.In",
-      y: y - 30,
-      onComplete: () => {
-        animation.destroy();
-      },
-      callbackScope: this,
-    });
-  }
-
   takeDamage = (dmg) => {
     if (!dmg) return;
-    this.createFloatingText(
-      this.sprite.body.x+8,
+    createFloatingText(
+      this.scene,
+      this.sprite.body.x + 8,
       this.sprite.body.center.y - 30,
       dmg,
-      0x000000,
-      "doomed"
+      0xffffff
     );
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
@@ -166,18 +155,35 @@ export default class Player {
     const body = this.sprite.body;
 
     // push back after took dmg
-    // this.scene.physics.moveTo(this.sprite, dir.x, dir.y, 500);
-    // this.hitTintDuration = this.scene.time.now + this.damageTime;
+    //this.scene.physics.moveTo(this.sprite, dir.x, dir.y, 500);
+    this.hitTintDuration = this.scene.time.now + this.damageTime;
   };
 
   freeze() {
     this.sprite.body.moves = false;
   }
 
+  updatePlayerExp = (exp) => {
+    this.exp += exp;
+    if (this.exp >= this.nextLevelExp) {
+      this.level++;
+      this.nextLevelExp = 100 * Math.pow(this.level, 2);
+      this.attack += 10;
+      createFloatingText(
+        this.scene,
+        this.sprite.body.x + 8,
+        this.sprite.body.center.y - 30,
+        `Level UP!`,
+        0xffa500
+      );
+    }
+  };
+
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
     eventsCenter.emit("UI_update", this);
+
     if (this.dead) {
       this.sprite.setTexture("blood");
       return;

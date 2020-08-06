@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import FirstMap from './scenes/FirstMap';
-import DungeonScene from './scenes/dungeon';
-import { LoadingScene } from './scenes/loadingScene';
-import MenuScene from './scenes/menuScene';
+import DungeonScene from './scenes/Dungeon';
+import { LoadingScene } from './scenes/LoadingScene';
+import MenuScene from './scenes/MenuScene';
 import GameUI from './scenes/UIScene/gameUI';
 import testScene from './scenes/testScene';
 
@@ -15,13 +15,13 @@ const config: Phaser.Types.Core.GameConfig = {
 		default: 'arcade',
 		arcade: {
 			gravity: { y: 0 },
-			debug: true
+			debug: false
 		}
 	},
 	//scene: [GameUI],
 	//scene: [LoadingScene, testScene],
 	//scene: [FirstMap, DungeonScene],
-	scene: [LoadingScene, MenuScene, FirstMap, DungeonScene,GameUI],
+	scene: [LoadingScene, MenuScene, FirstMap, DungeonScene, GameUI],
 	//scene: [DungeonScene],
 	scale: {
 		mode: Phaser.Scale.FIT,

@@ -28,22 +28,7 @@ export default class MenuScene extends Phaser.Scene {
 
     let music = this.sound.add("menuTheme2");
     this.sound.pauseOnBlur = false;
-    //music.play();
-
-    // this.add.image(
-    //   this.game.renderer.width / 2,
-    //   this.game.renderer.height * 0.2,
-    //   "gameNameLogo"
-    // );
-
-    // this.add.text(
-    //   this.game.renderer.width / 2.3,
-    //   this.game.renderer.height * 0.65,
-    //   "New Game",
-    //   {
-    //     fontSize: 50,
-    //   }
-    // );
+    music.play();
 
     this.add.bitmapText(
       this.game.renderer.width / 3,
