@@ -93,6 +93,7 @@ export default class Player {
     const scene = this.scene;
     const pointer = scene.input.mousePointer;
     const worldPoint = pointer.positionToCamera(scene.cameras.main);
+
     //const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
 
     // const snappedWorldPoint = this.map.tileToWorldXY(
@@ -148,6 +149,7 @@ export default class Player {
     this.hpBar.decrease(dmg);
     if (this.hp <= 0 && !this.dead) {
       this.deadSound.play();
+      this.sprite.anims.play("player-dead", true);
       this.destroy();
       return;
     }
@@ -185,9 +187,9 @@ export default class Player {
     eventsCenter.emit("UI_update", this);
 
     if (this.dead) {
-      this.sprite.setTexture("blood");
       return;
     }
+
     const spriteSpeed = 750;
     const scene = this.scene;
 
@@ -201,15 +203,22 @@ export default class Player {
       scene.time.now > this.nextAttack &&
       !this.dead
     ) {
+      sprite.anims.play("player-attack", true);
       this.attackHandler();
     }
+
+    // stop movement
+    sprite.setVelocityX(0);
+    sprite.setVelocityY(0);
     // Horizontal movement
     if (keys.left.isDown) {
       sprite.setVelocityX(-spriteSpeed);
-      sprite.anims.play("player-left-walk", true);
+      sprite.setFlipX(true);
+      sprite.anims.play("player-walk", true);
     } else if (keys.right.isDown) {
       sprite.setVelocityX(spriteSpeed);
-      sprite.anims.play("player-right-walk", true);
+      sprite.anims.play("player-walk", true);
+      sprite.setFlipX(false);
     }
     // Vertical movement
     else if (keys.up.isDown) {
@@ -221,34 +230,41 @@ export default class Player {
     else if (keys.W.isDown && keys.A.isDown) {
       sprite.setVelocityY(-spriteSpeed);
       sprite.setVelocityX(-spriteSpeed);
-      sprite.anims.play("player-left-walk", true);
+      sprite.setFlipX(true);
+      sprite.anims.play("player-walk", true);
     } else if (keys.W.isDown && keys.D.isDown) {
       sprite.setVelocityY(-spriteSpeed);
       sprite.setVelocityX(spriteSpeed);
-      sprite.anims.play("player-right-walk", true);
+      sprite.setFlipX(false);
+      sprite.anims.play("player-walk", true);
     } else if (keys.D.isDown && keys.S.isDown) {
       sprite.setVelocityX(spriteSpeed);
       sprite.setVelocityY(spriteSpeed);
-      sprite.anims.play("player-right-walk", true);
+      sprite.setFlipX(false);
+      sprite.anims.play("player-walk", true);
     } else if (keys.A.isDown && keys.S.isDown) {
       sprite.setVelocityX(-spriteSpeed);
       sprite.setVelocityY(spriteSpeed);
-      sprite.anims.play("player-left-walk", true);
+      sprite.setFlipX(true);
+      sprite.anims.play("player-walk", true);
     } else if (keys.W.isDown) {
       sprite.setVelocityY(-spriteSpeed);
+      sprite.anims.play("player-walk", true);
     } else if (keys.S.isDown) {
       sprite.setVelocityY(spriteSpeed);
+      sprite.anims.play("player-walk", true);
     } else if (keys.A.isDown) {
       sprite.setVelocityX(-spriteSpeed);
-      sprite.anims.play("player-left-walk", true);
+      sprite.setFlipX(true);
+      sprite.anims.play("player-walk", true);
     } else if (keys.D.isDown) {
       sprite.setVelocityX(spriteSpeed);
-      sprite.anims.play("player-right-walk", true);
-    } else {
-      sprite.setVelocityX(0);
-      sprite.setVelocityY(0);
+      sprite.setFlipX(false);
+      sprite.anims.play("player-walk", true);
+    } else if (!scene.input.activePointer.isDown) {
       sprite.anims.play("player-stand", true);
     }
+
     sprite.body.velocity.normalize().scale(spriteSpeed);
     this.hpBar.x = sprite.body.position.x;
     this.hpBar.y = sprite.body.position.y;

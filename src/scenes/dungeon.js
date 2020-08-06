@@ -69,7 +69,7 @@ export default class DungeonScene extends Phaser.Scene {
     createUglyThingAnims(this.anims);
 
     let music = this.sound.add("dungeonTheme");
-    music.play();
+    //music.play();
 
     // Generate a random world
     this.dungeon = new Dungeon({
@@ -96,12 +96,15 @@ export default class DungeonScene extends Phaser.Scene {
       "dungeonTileset",
       32,
       32,
-      0,
-      0
+      1,
+      2
     );
     const dungeon2 = map.addTilesetImage("dungeon2", "dungeon2", 32, 32, 1, 2);
-    this.groundLayer = map.createBlankDynamicLayer("groundLayer", dungeon2);
-    this.wallsLayer = map.createBlankDynamicLayer("wallsLayer", dungeon2);
+    this.groundLayer = map.createBlankDynamicLayer(
+      "groundLayer",
+      dungeonTileset
+    );
+    this.wallsLayer = map.createBlankDynamicLayer("wallsLayer", dungeonTileset);
     const tilesetStuff = map.addTilesetImage(
       "dungeonSet",
       "dungeonSet",
@@ -116,32 +119,151 @@ export default class DungeonScene extends Phaser.Scene {
       // destructuring
       const {x, y, width, height, left, right, top, bottom} = room;
       // Fill the floor
-      this.groundLayer.weightedRandomize(
-        x + 1,
-        y + 1,
-        width - 2,
-        height - 2,
-        TILES.FLOOR
-      );
+      this.groundLayer.weightedRandomize(x, y, width, height, TILES.FLOOR);
 
       // Place the room corners
       this.wallsLayer.putTileAt(TILES.WALL.TOP_LEFT, left, top);
+      this.wallsLayer.putTileAt(TILES.WALL.TOP_LEFT_1, left, top + 1);
       this.wallsLayer.putTileAt(TILES.WALL.TOP_RIGHT, right, top);
+      this.wallsLayer.putTileAt(TILES.WALL.TOP_RIGHT_1, right, top + 1);
       this.wallsLayer.putTileAt(TILES.WALL.BOTTOM_LEFT, left, bottom);
       this.wallsLayer.putTileAt(TILES.WALL.BOTTOM_RIGHT, right, bottom);
 
-      // Walls
+      // // Walls
       this.wallsLayer.fill(TILES.WALL.TOP, left + 1, top, width - 2, 1);
+      this.wallsLayer.fill(
+        TILES.WALL.TOP_FILL,
+        left + 1,
+        top + 1,
+        width - 2,
+        1
+      );
       this.wallsLayer.fill(TILES.WALL.BOTTOM, left + 1, bottom, width - 2, 1);
-      this.wallsLayer.fill(TILES.WALL.LEFT, left, top + 1, 1, height - 2);
-      this.wallsLayer.fill(TILES.WALL.RIGHT, right, top + 1, 1, height - 2);
+      this.wallsLayer.fill(TILES.WALL.LEFT, left, top + 2, 1, height - 3);
+      this.wallsLayer.fill(TILES.WALL.RIGHT, right, top + 2, 1, height - 3);
 
       // add doors
       // Dungeons have rooms that are connected with doors. Each door has an x & y relative to the
       // room's location. Each direction has a different door to tile mapping.
       const doors = room.getDoorLocations();
       for (let i = 0; i < doors.length; i++) {
-        this.wallsLayer.putTileAt(37, x + doors[i].x, y + doors[i].y);
+        const door = doors[i];
+
+        // depends on which wall door is, put different entrance to next room
+        switch (door.x) {
+          case 0: {
+            this.wallsLayer.putTileAt(TILES.FLOOR, x + door.x, y + door.y);
+            if (door.y === 2) {
+              this.wallsLayer.putTileAt(
+                TILES.WALL.TOP_FILL,
+                x + door.x,
+                y + door.y - 1
+              );
+            } else {
+              this.wallsLayer.putTileAt(
+                TILES.DOOR.TOP_LEFT,
+                x + door.x,
+                y + door.y - 1
+              );
+            }
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.BOTTOM_LEFT,
+              x + door.x,
+              y + door.y + 1
+            );
+          }
+          case door.x === width: {
+            console.log(door.x);
+            console.log(width);
+            //this.wallsLayer.putTileAt(TILES.FLOOR, x + door.x, y + door.y);
+            // this.wallsLayer.putTileAt(
+            //   TILES.DOOR.RIGHT_TOP_1,
+            //   x + door.x,
+            //   y + door.y - 1
+            // );
+            // this.wallsLayer.putTileAt(
+            //   TILES.DOOR.RIGHT_BOTTOM,
+            //   x + door.x,
+            //   y + door.y + 1
+            // );
+            //   if (door.y === 2) {
+            //     this.wallsLayer.putTileAt(
+            //       TILES.WALL.TOP_FILL,
+            //       x + door.x,
+            //       y + door.y - 1
+            //     );
+            //   } else {
+            //     this.wallsLayer.putTileAt(
+            //       TILES.DOOR.TOP_RIGHT,
+            //       x + door.x,
+            //       y + door.y - 1
+            //     );
+            //   }
+            //   this.wallsLayer.putTileAt(
+            //     TILES.DOOR.BOTTOM_RIGHT,
+            //     x + door.x,
+            //     y + door.y + 1
+            //   );
+            //   break;
+          }
+        }
+
+        switch (door.y) {
+          case 0: {
+            this.wallsLayer.putTileAt(TILES.FLOOR, x + door.x, y + door.y);
+            if (door.x === right - 2) {
+              this.wallsLayer.putTileAt(
+                TILES.WALL.RIGHT,
+                x + door.x - 1,
+                y + door.y - 1
+              );
+            } else {
+              this.wallsLayer.putTileAt(
+                TILES.DOOR.LEFT_TOP,
+                x + door.x - 1,
+                y + door.y - 1
+              );
+            }
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.LEFT_TOP,
+              x + door.x + 1,
+              y + door.y
+            );
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.TOP_LEFT,
+              x + door.x - 1,
+              y + door.y + 1
+            );
+
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.RIGHT_TOP,
+              x + door.x - 1,
+              y + door.y
+            );
+
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.TOP_RIGHT,
+              x + door.x + 1,
+              y + door.y + 1
+            );
+            this.wallsLayer.removeTileAt(x + door.x, y + door.y + 1);
+          }
+
+          case door.y === height - 1: {
+            this.wallsLayer.removeTileAt(x + door.x, y + door.y - 1);
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.LEFT_BOTTOM,
+              x + door.x - 1,
+              y + door.y - 1
+            );
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.RIGHT_BOTTOM,
+              x + door.x + 1,
+              y + door.y - 1
+            );
+            break;
+          }
+        }
       }
     });
 

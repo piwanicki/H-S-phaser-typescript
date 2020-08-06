@@ -6,27 +6,64 @@
 const TILE_MAPPING = {
   BLANK: 17,
 
-  // dungeon2 tileset
+  // // dungeon2 tileset
+  // WALL: {
+  //   TOP_LEFT: 0,
+  //   TOP_RIGHT: 2,
+  //   BOTTOM_LEFT: 16,
+  //   BOTTOM_RIGHT: 18,
+
+  //   // some randomization to the walls while we are refactoring:
+  //   TOP: 1,
+  //   LEFT: 8,
+  //   RIGHT: 10,
+  //   BOTTOM: 17,
+  // },
+
+  // FLOOR: [
+  //   {index: 37, weight: 7},
+  //   {index: [19, 20, 21], weight: 3},
+  // ],
+  // DOOR: {
+  //   TOP: 1,
+  //   BOTTOM: 17,
+  // },
+
+  // Dungeon_Tileset
   WALL: {
-    TOP_LEFT: 0,
-    TOP_RIGHT: 2,
-    BOTTOM_LEFT: 16,
-    BOTTOM_RIGHT: 18,
+    TOP_LEFT: 3,
+    TOP_LEFT_1: 19,
+    TOP_FILL: 20,
+    TOP_RIGHT: 5,
+    TOP_RIGHT_1: 21,
+    BOTTOM_LEFT: 51,
+    BOTTOM_LEFT_1: 35,
+    BOTTOM_RIGHT: 53,
+    BOTTOM_RIGHT_1: 37,
 
     // some randomization to the walls while we are refactoring:
-    TOP: 1,
-    LEFT: 8,
-    RIGHT: 10,
-    BOTTOM: 17,
+    TOP: 4,
+    LEFT: 18,
+    RIGHT: 16,
+    BOTTOM: 52,
+    BOTTOM_1: 36,
   },
 
   FLOOR: [
-    {index: 37, weight: 7},
-    {index: [19, 20, 21], weight: 3},
+    {index: 88, weight: 2},
+    {index: [89, 90, 91, 92, 93,], weight: 8},
   ],
   DOOR: {
-    TOP: 1,
-    BOTTOM: 17,
+    TOP_LEFT: 50,
+    TOP_RIGHT: 48,
+    BOTTOM_LEFT: 2,
+    BOTTOM_RIGHT: 0,
+    LEFT_BOTTOM: 113,
+    RIGHT_BOTTOM: 114,
+    LEFT_TOP: 32,
+    LEFT_TOP_1: 81,
+    RIGHT_TOP: 34,
+    RIGHT_TOP_1: 82,
   },
 
   // dungeonSet tileset
