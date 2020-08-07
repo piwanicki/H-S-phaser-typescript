@@ -17,10 +17,6 @@ export default class GameUI extends Phaser.Scene {
         super({ key: scenesKeys.scenes.GAME_UI })
     }
 
-    init() {
-
-    }
-
     create() {
 
         this.playerHPBar = this.add.rectangle(0, 0, 250, 20, 0x11c10e);

@@ -5,35 +5,16 @@
 
 const TILE_MAPPING = {
   BLANK: 17,
-
-  // // dungeon2 tileset
-  // WALL: {
-  //   TOP_LEFT: 0,
-  //   TOP_RIGHT: 2,
-  //   BOTTOM_LEFT: 16,
-  //   BOTTOM_RIGHT: 18,
-
-  //   // some randomization to the walls while we are refactoring:
-  //   TOP: 1,
-  //   LEFT: 8,
-  //   RIGHT: 10,
-  //   BOTTOM: 17,
-  // },
-
-  // FLOOR: [
-  //   {index: 37, weight: 7},
-  //   {index: [19, 20, 21], weight: 3},
-  // ],
-  // DOOR: {
-  //   TOP: 1,
-  //   BOTTOM: 17,
-  // },
-
   // Dungeon_Tileset
   WALL: {
     TOP_LEFT: 3,
     TOP_LEFT_1: 19,
-    TOP_FILL: 20,
+    TOP_FILL_NORMAL: 25,
+    TOP_FILL: [
+      {index: [25, 26, 27, 28, 29], weight: 7},
+      {index: [57, 61], weight: 2},
+      {index: 30, weight: 1},
+    ],
     TOP_RIGHT: 5,
     TOP_RIGHT_1: 21,
     BOTTOM_LEFT: 51,
@@ -51,7 +32,7 @@ const TILE_MAPPING = {
 
   FLOOR: [
     {index: 88, weight: 2},
-    {index: [89, 90, 91, 92, 93,], weight: 8},
+    {index: [89, 90, 91, 92, 93], weight: 8},
   ],
   DOOR: {
     TOP_LEFT: 50,

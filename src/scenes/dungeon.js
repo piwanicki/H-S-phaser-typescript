@@ -9,7 +9,6 @@ import createTentacleAnims from "../anims/tentacle-anims";
 import createPlayerAnims from "../anims/player-anims";
 import createUglyThingAnims from "../anims/uglyThing-anims";
 import {scenesKeys} from "./scenesKeys";
-import eventsCenter from "../events/eventsCenter";
 import EnemyGroup from "~/enemies/EnemyGroup";
 
 export default class DungeonScene extends Phaser.Scene {
@@ -32,9 +31,7 @@ export default class DungeonScene extends Phaser.Scene {
   UglyThing;
   enemies;
 
-  //addEnemyInRoom(x, y, sprite) {
   addEnemyInRoom(enemy) {
-    //const enemy = this.enemies.get(x, y, sprite);
     // set active and visible
     this.enemies.add(enemy);
     enemy.setActive(true);
@@ -131,12 +128,12 @@ export default class DungeonScene extends Phaser.Scene {
 
       // // Walls
       this.wallsLayer.fill(TILES.WALL.TOP, left + 1, top, width - 2, 1);
-      this.wallsLayer.fill(
-        TILES.WALL.TOP_FILL,
+      this.wallsLayer.weightedRandomize(
         left + 1,
         top + 1,
         width - 2,
-        1
+        1,
+        TILES.WALL.TOP_FILL
       );
       this.wallsLayer.fill(TILES.WALL.BOTTOM, left + 1, bottom, width - 2, 1);
       this.wallsLayer.fill(TILES.WALL.LEFT, left, top + 2, 1, height - 3);
@@ -146,84 +143,84 @@ export default class DungeonScene extends Phaser.Scene {
       // Dungeons have rooms that are connected with doors. Each door has an x & y relative to the
       // room's location. Each direction has a different door to tile mapping.
       const doors = room.getDoorLocations();
+
       for (let i = 0; i < doors.length; i++) {
         const door = doors[i];
 
         // depends on which wall door is, put different entrance to next room
         switch (door.x) {
-          case 0: {
+          case 0:
+            {
+              this.wallsLayer.putTileAt(TILES.FLOOR, x + door.x, y + door.y);
+              if (door.y === 2) {
+                this.wallsLayer.putTileAt(
+                  TILES.WALL.TOP_FILL_NORMAL,
+                  x + door.x,
+                  y + door.y - 1
+                );
+              } else {
+                this.wallsLayer.putTileAt(
+                  TILES.DOOR.TOP_LEFT,
+                  x + door.x,
+                  y + door.y - 1
+                );
+              }
+              this.wallsLayer.putTileAt(
+                TILES.DOOR.BOTTOM_LEFT,
+                x + door.x,
+                y + door.y + 1
+              );
+            }
+            break;
+          case width - 1: {
             this.wallsLayer.putTileAt(TILES.FLOOR, x + door.x, y + door.y);
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.RIGHT_TOP_1,
+              x + door.x,
+              y + door.y - 1
+            );
+            this.wallsLayer.putTileAt(
+              TILES.DOOR.RIGHT_BOTTOM,
+              x + door.x,
+              y + door.y + 1
+            );
             if (door.y === 2) {
               this.wallsLayer.putTileAt(
-                TILES.WALL.TOP_FILL,
+                TILES.WALL.TOP_FILL_NORMAL,
                 x + door.x,
                 y + door.y - 1
               );
             } else {
               this.wallsLayer.putTileAt(
-                TILES.DOOR.TOP_LEFT,
+                TILES.DOOR.TOP_RIGHT,
                 x + door.x,
                 y + door.y - 1
               );
             }
             this.wallsLayer.putTileAt(
-              TILES.DOOR.BOTTOM_LEFT,
+              TILES.DOOR.BOTTOM_RIGHT,
               x + door.x,
               y + door.y + 1
             );
-          }
-          case door.x === width: {
-            console.log(door.x);
-            console.log(width);
-            //this.wallsLayer.putTileAt(TILES.FLOOR, x + door.x, y + door.y);
-            // this.wallsLayer.putTileAt(
-            //   TILES.DOOR.RIGHT_TOP_1,
-            //   x + door.x,
-            //   y + door.y - 1
-            // );
-            // this.wallsLayer.putTileAt(
-            //   TILES.DOOR.RIGHT_BOTTOM,
-            //   x + door.x,
-            //   y + door.y + 1
-            // );
-            //   if (door.y === 2) {
-            //     this.wallsLayer.putTileAt(
-            //       TILES.WALL.TOP_FILL,
-            //       x + door.x,
-            //       y + door.y - 1
-            //     );
-            //   } else {
-            //     this.wallsLayer.putTileAt(
-            //       TILES.DOOR.TOP_RIGHT,
-            //       x + door.x,
-            //       y + door.y - 1
-            //     );
-            //   }
-            //   this.wallsLayer.putTileAt(
-            //     TILES.DOOR.BOTTOM_RIGHT,
-            //     x + door.x,
-            //     y + door.y + 1
-            //   );
-            //   break;
           }
         }
 
         switch (door.y) {
           case 0: {
             this.wallsLayer.putTileAt(TILES.FLOOR, x + door.x, y + door.y);
-            if (door.x === right - 2) {
-              this.wallsLayer.putTileAt(
-                TILES.WALL.RIGHT,
-                x + door.x - 1,
-                y + door.y - 1
-              );
-            } else {
-              this.wallsLayer.putTileAt(
-                TILES.DOOR.LEFT_TOP,
-                x + door.x - 1,
-                y + door.y - 1
-              );
-            }
+            // if (door.x === right - 2) {
+            //   this.wallsLayer.putTileAt(
+            //     TILES.WALL.RIGHT,
+            //     x + door.x - 1,
+            //     y + door.y - 1
+            //   );
+            // } else {
+            //   this.wallsLayer.putTileAt(
+            //     TILES.DOOR.LEFT_TOP,
+            //     x + door.x - 1,
+            //     y + door.y - 1
+            //   );
+            // }
             this.wallsLayer.putTileAt(
               TILES.DOOR.LEFT_TOP,
               x + door.x + 1,
@@ -247,21 +244,21 @@ export default class DungeonScene extends Phaser.Scene {
               y + door.y + 1
             );
             this.wallsLayer.removeTileAt(x + door.x, y + door.y + 1);
+            break;
           }
 
-          case door.y === height - 1: {
-            this.wallsLayer.removeTileAt(x + door.x, y + door.y - 1);
+          case height - 1: {
+            this.wallsLayer.removeTileAt(x + door.x, y + door.y);
             this.wallsLayer.putTileAt(
               TILES.DOOR.LEFT_BOTTOM,
               x + door.x - 1,
-              y + door.y - 1
+              y + door.y
             );
             this.wallsLayer.putTileAt(
               TILES.DOOR.RIGHT_BOTTOM,
               x + door.x + 1,
-              y + door.y - 1
+              y + door.y
             );
-            break;
           }
         }
       }
@@ -298,10 +295,29 @@ export default class DungeonScene extends Phaser.Scene {
     //groundLayer.putTilesAt(mappedTiles, 0, 0);
 
     // We only need one tile index (the wallsLayer) to be colliding for now
+
+    // move collision to property in tiled
     this.wallsLayer.setCollision(TILES.WALL.TOP);
     this.wallsLayer.setCollision(TILES.WALL.BOTTOM);
     this.wallsLayer.setCollision(TILES.WALL.LEFT);
     this.wallsLayer.setCollision(TILES.WALL.RIGHT);
+
+    this.wallsLayer.setCollision(TILES.WALL.TOP_LEFT);
+    this.wallsLayer.setCollision(TILES.WALL.TOP_LEFT_1);
+    this.wallsLayer.setCollision(TILES.WALL.TOP_RIGHT);
+    this.wallsLayer.setCollision(TILES.WALL.TOP_RIGHT_1);
+    this.wallsLayer.setCollision(TILES.WALL.BOTTOM_LEFT);
+    this.wallsLayer.setCollision(TILES.WALL.BOTTOM_1);
+    this.wallsLayer.setCollision(TILES.WALL.BOTTOM_LEFT_1);
+    this.wallsLayer.setCollision(TILES.WALL.BOTTOM_RIGHT);
+    this.wallsLayer.setCollision(TILES.WALL.BOTTOM_RIGHT_1);
+
+    this.wallsLayer.setCollision(TILES.DOOR.LEFT_BOTTOM);
+    this.wallsLayer.setCollision(TILES.DOOR.RIGHT_BOTTOM);
+    this.wallsLayer.setCollision(TILES.DOOR.BOTTOM_LEFT);
+    this.wallsLayer.setCollision(TILES.DOOR.BOTTOM_RIGHT);
+    this.wallsLayer.setCollision(TILES.DOOR.LEFT_TOP);
+    this.wallsLayer.setCollision(TILES.DOOR.RIGHT_TOP);
 
     //this.stuffLayer.setCollisionByProperty({collide: true});
     this.stuffLayer.setCollision(TILES.FOUNTAIN);

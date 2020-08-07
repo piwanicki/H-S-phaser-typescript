@@ -170,10 +170,10 @@ export default class Player {
     if (this.exp >= this.nextLevelExp) {
       this.level++;
       this.nextLevelExp = 100 * Math.pow(this.level, 2);
-      this.attack += 10;
+      this.attack += 2;
       createFloatingText(
         this.scene,
-        this.sprite.body.x + 8,
+        this.sprite.body.x,
         this.sprite.body.center.y - 30,
         `Level UP!`,
         0xffa500
