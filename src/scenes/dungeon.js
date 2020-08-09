@@ -30,6 +30,8 @@ export default class DungeonScene extends Phaser.Scene {
   tentacle;
   UglyThing;
   enemies;
+  tilemap;
+  tilesetStuff;
 
   addEnemyInRoom(enemy) {
     // set active and visible
@@ -81,14 +83,14 @@ export default class DungeonScene extends Phaser.Scene {
     });
 
     // Create a blank tilemap with dimensions matching the dungeon
-    const map = this.make.tilemap({
+    this.tilemap = this.make.tilemap({
       tileWidth: 32,
       tileHeight: 32,
       width: this.dungeon.width,
       height: this.dungeon.height,
     });
 
-    const dungeonTileset = map.addTilesetImage(
+    const dungeonTileset = this.tilemap.addTilesetImage(
       "dungeonTileset",
       "dungeonTileset",
       32,
@@ -96,13 +98,13 @@ export default class DungeonScene extends Phaser.Scene {
       1,
       2
     );
-    const dungeon2 = map.addTilesetImage("dungeon2", "dungeon2", 32, 32, 1, 2);
-    this.groundLayer = map.createBlankDynamicLayer(
+    const dungeon2 = this.tilemap.addTilesetImage("dungeon2", "dungeon2", 32, 32, 1, 2);
+    this.groundLayer = this.tilemap.createBlankDynamicLayer(
       "groundLayer",
       dungeonTileset
     );
-    this.wallsLayer = map.createBlankDynamicLayer("wallsLayer", dungeonTileset);
-    const tilesetStuff = map.addTilesetImage(
+    this.wallsLayer = this.tilemap.createBlankDynamicLayer("wallsLayer", dungeonTileset);
+    this.tilesetStuff = this.tilemap.addTilesetImage(
       "dungeonSet",
       "dungeonSet",
       32,
@@ -110,7 +112,7 @@ export default class DungeonScene extends Phaser.Scene {
       1,
       2
     );
-    this.stuffLayer = map.createBlankDynamicLayer("stuffLayer", tilesetStuff);
+    this.stuffLayer = this.tilemap.createBlankDynamicLayer("stuffLayer", this.tilesetStuff);
 
     this.dungeon.rooms.forEach((room) => {
       // destructuring
@@ -143,6 +145,7 @@ export default class DungeonScene extends Phaser.Scene {
       // Dungeons have rooms that are connected with doors. Each door has an x & y relative to the
       // room's location. Each direction has a different door to tile mapping.
       const doors = room.getDoorLocations();
+      console.log(this)
 
       for (let i = 0; i < doors.length; i++) {
         const door = doors[i];
@@ -326,23 +329,23 @@ export default class DungeonScene extends Phaser.Scene {
     this.stuffLayer.setCollision(TILES.STATUE_1);
     this.stuffLayer.setCollision(TILES.STATUE_2);
 
-    // Place the player in the center of the map. This works because the Dungeon generator places
-    // the first room in the center of the map.
+    // Place the player in the center of the this.tilemap. This works because the Dungeon generator places
+    // the first room in the center of the this.tilemap.
 
     const axe = "axe.cur";
     const playerRoom = startRoom;
-    const playerX = map.tileToWorldX(playerRoom.centerX);
-    const playerY = map.tileToWorldY(playerRoom.centerY);
-    this.player = new Player(this, "player", playerX, playerY, axe, map);
+    const playerX = this.tilemap.tileToWorldX(playerRoom.centerX);
+    const playerY = this.tilemap.tileToWorldY(playerRoom.centerY);
+    this.player = new Player(this, "player", playerX, playerY, axe, this.tilemap);
     this.stuffLayer.putTileAt(
       TILES.STAIRS_UP,
       this.player.sprite.x + 50,
       this.player.sprite.y
     );
 
-    this.enemiesLayer = map.createBlankDynamicLayer(
+    this.enemiesLayer = this.tilemap.createBlankDynamicLayer(
       "enemies",
-      tilesetStuff,
+      this.tilesetStuff,
       0,
       0
     );
@@ -359,7 +362,7 @@ export default class DungeonScene extends Phaser.Scene {
     // Place stuffLayer in the 90% "otherRooms"
     otherRooms.forEach((room) => {
       const rand = Math.random();
-      const roomCenterOnWorldMap = map.tileToWorldXY(
+      const roomCenterOnWorldMap = this.tilemap.tileToWorldXY(
         room.centerX,
         room.centerY
       );
@@ -538,7 +541,7 @@ export default class DungeonScene extends Phaser.Scene {
     // Phaser supports multiple cameras, but you can access the default camera like this:
     const camera = this.cameras.main;
     camera.startFollow(this.player.sprite);
-    camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    camera.setBounds(0, 0, this.tilemap.widthInPixels, this.tilemap.heightInPixels);
     camera.setZoom(2);
 
     // Help text that has a "fixed" position on the screen
@@ -595,7 +598,7 @@ export default class DungeonScene extends Phaser.Scene {
         }
       }
     });
-    const shadowLayer = map
+    const shadowLayer = this.tilemap
       .createBlankDynamicLayer("shadow", dungeonTileset)
       .fill(TILES.BLANK);
 
