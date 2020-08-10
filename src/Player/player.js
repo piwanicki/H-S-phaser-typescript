@@ -26,7 +26,7 @@ export default class Player {
   exp = 0;
   nextLevelExp = 100 * (this.level * Math.pow(this.level, 2));
 
-  constructor(scene, sprite, x, y, playerCursorSprite, map, scale = 1) {
+  constructor(scene, sprite, x, y, playerCursorSprite, scale = 1) {
     this.scene = scene;
     this.sprite = scene.physics.add
       .sprite(x, y, sprite, 0)
@@ -35,7 +35,6 @@ export default class Player {
       .setScale(scale);
     this.playerCursorSprite = playerCursorSprite;
     this.missiles = scene.physics.add.group();
-    this.map = map;
     this.inventory = {};
     this.hp = 200;
     this.mana = 100;
@@ -93,13 +92,6 @@ export default class Player {
     const scene = this.scene;
     const pointer = scene.input.mousePointer;
     const worldPoint = pointer.positionToCamera(scene.cameras.main);
-
-    //const pointerTileXY = this.map.worldToTileXY(worldPoint.x, worldPoint.y);
-
-    // const snappedWorldPoint = this.map.tileToWorldXY(
-    //   pointerTileXY.x,
-    //   pointerTileXY.y
-    // );
 
     this.nextAttack = scene.time.now + this.fireRate;
     const angle = Phaser.Math.Angle.Between(

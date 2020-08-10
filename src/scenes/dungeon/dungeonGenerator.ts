@@ -9,10 +9,10 @@ import UglyThing from "../../enemies/UglyThing";
 export default class DungeonMap {
   private dungeon!: Dungeon;
   private scene!: Phaser.Scene;
+  private enemies!: EnemyGroup;
 
   constructor(scene) {
     this.scene = scene;
-
     this.dungeon = new Dungeon({
       width: 50,
       height: 50,
@@ -23,11 +23,23 @@ export default class DungeonMap {
         maxRooms: 12,
       },
     });
+
+    const enemyGroupConfig = {
+      createCallback: (gameObj) => {
+        const Obj = gameObj;
+        Obj.body.onOverlap = true;
+      },
+    };
+    this.enemies = new EnemyGroup(
+      this.scene.physics.world,
+      this.scene,
+      enemyGroupConfig
+    );
   }
 
   private addEnemyInRoom(enemy) {
     // set active and visible
-    this.scene.enemies.add(enemy);
+    this.enemies.add(enemy);
     enemy.setActive(true);
     enemy.setVisible(true);
     //
@@ -42,7 +54,7 @@ export default class DungeonMap {
   private createTentacle = (
     x: number,
     y: number,
-        scene: Phaser.Scene = this.scene,
+    scene: Phaser.Scene = this.scene,
     texture: string = "tentacle"
   ) => {
     const tentacle = new Tentacle(scene, x, y, texture);
@@ -50,9 +62,9 @@ export default class DungeonMap {
   };
 
   private createUglyThing = (
-      x: number,
-      y: number,
-      scene: Phaser.Scene = this.scene,
+    x: number,
+    y: number,
+    scene: Phaser.Scene = this.scene,
     texture: string = "uglyThing"
   ) => {
     const uglyThing = new UglyThing(scene, x, y, texture);
@@ -60,12 +72,13 @@ export default class DungeonMap {
   };
 
   private generateMap = () => {
-    const tilesetStuff = this.scene.tilesetStuff;
-    const groundLayer = this.scene.groundLayer;
-    const wallsLayer = this.scene.wallsLayer;
-    const stuffLayer = this.scene.stuffLayer;
-    const enemiesLayer = this.scene.enemiesLayer;
-    const map = this.scene.tilemap;
+    const tilesetStuff = this.scene["tilesetStuff"];
+    const groundLayer = this.scene["groundLayer"];
+    const wallsLayer = this.scene["wallsLayer"];
+    const stuffLayer = this.scene["stuffLayer"];
+    const enemiesLayer = this.scene["enemiesLayer"];
+    const map = this.scene["tilemap"];
+    const player = this.scene["player"];
 
     this.dungeon.rooms.forEach((room) => {
       // destructuring
@@ -227,11 +240,15 @@ export default class DungeonMap {
       rooms.length * 0.9
     );
 
-    stuffLayer.putTileAt(TILES.STAIRS_DOWN, endRoom.centerX, endRoom.centerY);
+    stuffLayer.putTileAt(
+      TILES.STAIRS_DOWN,
+      endRoom["centerX"],
+      endRoom["centerY"]
+    );
     stuffLayer.putTileAt(
       TILES.STAIRS_UP,
-      startRoom.centerX - 2,
-      startRoom.centerY
+      startRoom!.centerX - 2,
+      startRoom!.centerY
     );
 
     // Get a 2D array of tile indices (using -1 to not render empty tiles) and place them into the
@@ -280,29 +297,15 @@ export default class DungeonMap {
     // Place the player in the center of the map. This works because the Dungeon generator places
     // the first room in the center of the map.
 
-    const player = this.scene.player;
     const playerRoom = startRoom;
-    const playerX = map.tileToWorldX(playerRoom.centerX);
-    const playerY = map.tileToWorldY(playerRoom.centerY);
+    const playerX = map.tileToWorldX(playerRoom!["centerX"]);
+    const playerY = map.tileToWorldY(playerRoom!["centerY"]);
+    player.sprite.x = playerX;
+    player.sprite.y = playerY;
     stuffLayer.putTileAt(
       TILES.STAIRS_UP,
       player.sprite.x + 50,
       player.sprite.y
-    );
-
-    // Add enemies and
-
-    const enemyGroupConfig = {
-      createCallback: (gameObj) => {
-        const Obj = gameObj;
-        Obj.body.onOverlap = true;
-      },
-    };
-
-    const enemies = new EnemyGroup(
-      this.scene.physics.world,
-      this,
-      enemyGroupConfig
     );
 
     // Place stuffLayer in the 90% "otherRooms"
@@ -315,62 +318,49 @@ export default class DungeonMap {
       if (rand <= 0.05) {
         // 5% chance of chest
         stuffLayer.putTileAt(TILES.HP, room.centerX, room.centerY);
-        this.createTentacle(roomCenterOnWorldMap.x + 50,
-            roomCenterOnWorldMap.y + 50);
-        this.createUglyThing();
+        this.createTentacle(
+          roomCenterOnWorldMap.x + 50,
+          roomCenterOnWorldMap.y + 50
+        );
+        this.createUglyThing(
+          roomCenterOnWorldMap.x + 80,
+          roomCenterOnWorldMap.y + 80
+        );
       } else if (rand <= 0.1) {
         // 10% chance of Mana
         stuffLayer.putTileAt(TILES.MANA, room.centerX, room.centerY);
-        const tentacle = new Tentacle(
-          this.scene,
+        this.createTentacle(
           roomCenterOnWorldMap.x + 50,
-          roomCenterOnWorldMap.y + 50,
-          "tentacle"
+          roomCenterOnWorldMap.y + 50
         );
-        this.addEnemyInRoom(tentacle);
-        const uglyThing = new UglyThing(
-          this.scene,
+        this.createUglyThing(
           roomCenterOnWorldMap.x + 80,
-          roomCenterOnWorldMap.y + 80,
-          "uglyThing"
+          roomCenterOnWorldMap.y + 80
         );
-        this.addEnemyInRoom(uglyThing);
       } else if (rand <= 0.25) {
         // 25% chance of chest
         stuffLayer.putTileAt(TILES.CHEST, room.centerX, room.centerY);
-        const tentacle = new Tentacle(
-          this.scene,
+        this.createTentacle(
           roomCenterOnWorldMap.x + 50,
-          roomCenterOnWorldMap.y + 50,
-          "tentacle"
+          roomCenterOnWorldMap.y + 50
         );
-        this.addEnemyInRoom(tentacle);
-        const uglyThing = new UglyThing(
-          this.scene,
+        this.createUglyThing(
           roomCenterOnWorldMap.x + 100,
-          roomCenterOnWorldMap.y + 80,
-          "uglyThing"
+          roomCenterOnWorldMap.y + 80
         );
-        this.addEnemyInRoom(uglyThing);
       } else if (rand <= 0.5) {
         // 50% chance of a pot anywhere in the room... except don't block a door!
         const x = Phaser.Math.Between(room.left + 2, room.right - 2);
         const y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
         stuffLayer.putTileAt(TILES.PENTAGRAM, x, y);
-        const tentacle = new Tentacle(
-          this.scene,
+        this.createTentacle(
           roomCenterOnWorldMap.x + 50,
-          roomCenterOnWorldMap.y + 50,
-          "tentacle"
+          roomCenterOnWorldMap.y + 50
         );
-        this.addEnemyInRoom(tentacle);
-        const uglyThing = new UglyThing(
-          this.scene,
+        this.createUglyThing(
           roomCenterOnWorldMap.x + 100,
-          roomCenterOnWorldMap.y + 80,
-          "uglyThing"
+          roomCenterOnWorldMap.y + 80
         );
-        this.addEnemyInRoom(uglyThing);
       } else {
         // 25% of either 2 or 4 towers, depending on the room size
         if (room.height >= 9) {
@@ -395,20 +385,14 @@ export default class DungeonMap {
             room.centerX + 1,
             room.centerY + 1
           );
-          const tentacle = new Tentacle(
-            this.scene,
+          this.createTentacle(
+            roomCenterOnWorldMap.x + 50,
+            roomCenterOnWorldMap.y + 50
+          );
+          this.createUglyThing(
             roomCenterOnWorldMap.x + 80,
-            roomCenterOnWorldMap.y + 50,
-            "tentacle"
+            roomCenterOnWorldMap.y
           );
-          this.addEnemyInRoom(tentacle);
-          const uglyThing = new UglyThing(
-            this.scene,
-            roomCenterOnWorldMap.x - 50,
-            roomCenterOnWorldMap.y,
-            "uglyThing"
-          );
-          this.addEnemyInRoom(uglyThing);
         } else {
           stuffLayer.putTileAt(
             TILES.STATUE_1,
@@ -420,22 +404,17 @@ export default class DungeonMap {
             room.centerX + 1,
             room.centerY - 1
           );
-          const tentacle = new Tentacle(
-            this.scene,
+          this.createTentacle(
+            roomCenterOnWorldMap.x + 50,
+            roomCenterOnWorldMap.y + 50
+          );
+          this.createUglyThing(
             roomCenterOnWorldMap.x + 80,
-            roomCenterOnWorldMap.y + 50,
-            "tentacle"
+            roomCenterOnWorldMap.y + 80
           );
-          const uglyThing = new UglyThing(
-            this.scene,
-            roomCenterOnWorldMap.x + 100,
-            roomCenterOnWorldMap.y + 10,
-            "uglyThing"
-          );
-          this.addEnemyInRoom(uglyThing);
-          this.addEnemyInRoom(tentacle);
         }
       }
     });
+    return this.dungeon;
   };
 }

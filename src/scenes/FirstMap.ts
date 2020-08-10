@@ -119,10 +119,7 @@ export default class FirstMap extends Phaser.Scene {
 
         // spawnPoint in Tiled
         const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
-
-        const ankus = 'ankus.cur';
-        const axe = 'axe.cur';
-        this.player = new Player(this, 'player', spawnPoint.x, spawnPoint.y, axe, map);
+        this.player = new Player(this, 'player', spawnPoint.x, spawnPoint.y);
 
         this.player.sprite.setCollideWorldBounds(true);
         this.player.sprite.body.setBoundsRectangle(

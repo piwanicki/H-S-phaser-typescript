@@ -175,8 +175,8 @@ export class LoadingScene extends Phaser.Scene {
     });
 
     this.load.on("complete", () => {
-      //this.scene.start(scenesKeys.scenes.MENU, "data to pass into next scene");
-      this.scene.start(scenesKeys.scenes.DUNGEON, "data to pass into next scene");
+      this.scene.start(scenesKeys.scenes.MENU, "data to pass into next scene");
+      //this.scene.start(scenesKeys.scenes.DUNGEON, "data to pass into next scene");
       //this.scene.start('Game', "data to pass into next scene");
     });
   }
