@@ -1,8 +1,6 @@
 import { scenesKeys } from '../scenesKeys';
 import eventsCenter from '../../events/eventsCenter';
-import StatusBar from '~/statusBar/StatusBar';
 import Player from '~/Player/Player';
-import createUglyThingAnims from '~/anims/uglyThing-anims';
 
 export default class GameUI extends Phaser.Scene {
     private playerHP!: number;

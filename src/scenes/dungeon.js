@@ -1,15 +1,11 @@
 import Phaser from "phaser";
-import Dungeon from "@mikewesthad/dungeon";
 import Player from "../Player/Player";
 import TILES from "./tileMapping";
 import TilemapVisibility from "./TilemapVisibility";
-import Tentacle from "../enemies/Tentacle";
-import UglyThing from "../enemies/UglyThing";
 import createTentacleAnims from "../anims/tentacle-anims";
 import createPlayerAnims from "../anims/player-anims";
 import createUglyThingAnims from "../anims/uglyThing-anims";
 import { scenesKeys } from "./scenesKeys";
-import EnemyGroup from "~/enemies/EnemyGroup";
 import DungeonMap from "./dungeon/dungeonGenerator";
 
 export default class DungeonScene extends Phaser.Scene {

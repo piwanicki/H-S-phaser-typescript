@@ -1,10 +1,10 @@
-import Phaser from 'phaser';
-import StatusBar from '~/statusBar/StatusBar';
-import MissileContainer from '../attackMissile/MissileContainer';
-import TILES from '../scenes/tileMapping';
-import { createFloatingText } from '../scenes/UIScene/UIFunctions';
-import eventsCenter from '~/events/eventsCenter';
+import Phaser from "phaser";
+import StatusBar from "~/statusBar/StatusBar";
+import { createFloatingText } from "../../scenes/UIScene/UIFunctions";
+import { animsKeys } from "~/anims/animsKeys";
+import Enemy from "../Enemy";
 
+/*
 enum Direction {
     UP, DOWN, LEFT, RIGHT
 }
@@ -32,7 +32,7 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | string) {
         super(scene, x, y, texture, frame);
-        this.anims.play('uglyThing-anim');
+        this.anims.play(animsKeys.UGLYTHING.move);
         //scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_OVERLAP, this.dealPhysicalDamage, this)
 
         // this.moveEvent = scene.time.addEvent({
@@ -73,11 +73,11 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
         createFloatingText(this.scene, this.x - 8, this.y - 30, dmg, 0xFFFFFF, null);
         if (this.hp <= 0 && !this.dead) {
             this.dead = true;
-            this.anims.play('deadTentacle');
+            this.anims.play(animsKeys.UGLYTHING.dead);
             this.deadSound.play();
             this.on('animationcomplete', (animation) => {
-                if (animation.key === 'deadTentacle') {
-                    this.scene.player.updatePlayerExp(this.exp);
+                if (animation.key === animsKeys.UGLYTHING.dead) {
+                    this.scene['player'].updatePlayerExp(this.exp);
                     this.destroy();
                 }
             });
@@ -122,7 +122,7 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(time: number, delta: number) {
-        const player = this.scene.player;
+        const player = this.scene['player'];
         if (this.dead || player.dead) {
             this.body.moves = false;
             return
@@ -138,4 +138,48 @@ export default class UglyThing extends Phaser.Physics.Arcade.Sprite {
         super.destroy(fromScene);
     }
 
+}
+*/
+
+export default class UglyThing extends Enemy {
+  constructor(scene, x, y, texture, anims) {
+    super(scene, x, y, texture, anims);
+
+    this.speed = 100;
+    this.hp = 350;
+    this.attack = 30;
+    this.level = 1;
+    this.fireRate = 800;
+    this.nextPhysicalAttack = 0;
+    this.missiles;
+    this.missile;
+    this.range = 20;
+    this.dead = false;
+    this.hitSound;
+    this.deadSound;
+    this.exp = this.level * 30;
+  }
+
+  update(time: number, delta: number) {
+    const player = this.scene["player"];
+    if (this.dead || player.dead) {
+      this.body['moves'] = false;
+      return;
+    }
+    this.scene.physics.moveTo(
+      this,
+      player.sprite.body.center.x,
+      player.sprite.body.center.y,
+      100
+    );
+    this.hpBar.x = this.body.position.x;
+    this.hpBar.y = this.body.position.y;
+    this.hpBar.update(time, delta);
+    console.log(this)
+  }
+
+  destroy(fromScene?: boolean) {
+    //this.moveEvent.destroy();
+    super.destroy(fromScene);
+  }
 }

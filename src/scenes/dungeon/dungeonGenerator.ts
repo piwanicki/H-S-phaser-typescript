@@ -3,8 +3,9 @@ import TILES from "../tileMapping";
 import EnemyGroup from "../../enemies/EnemyGroup";
 
 // imports Enemies classes
-import Tentacle from "../../enemies/Tentacle";
-import UglyThing from "../../enemies/UglyThing";
+import Tentacle from "../../enemies/enemiesTypes/Tentacle";
+import UglyThing from "../../enemies/enemiesTypes/UglyThing";
+import { animsKeys } from '~/anims/animsKeys';
 
 export default class DungeonMap {
   private dungeon!: Dungeon;
@@ -67,7 +68,7 @@ export default class DungeonMap {
     scene: Phaser.Scene = this.scene,
     texture: string = "uglyThing"
   ) => {
-    const uglyThing = new UglyThing(scene, x, y, texture);
+    const uglyThing = new UglyThing(scene, x, y, texture,animsKeys.UGLYTHING);
     this.addEnemyInRoom(uglyThing);
   };
 

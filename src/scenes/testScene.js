@@ -1,5 +1,5 @@
 import EnemyGroup from "../enemies/EnemyGroup";
-import Tentacle from "../enemies/Tentacle";
+import Tentacle from "../enemies/enemiesTypes/Tentacle";
 import UglyThing from "../enemies/UglyThing";
 
 export default class GameScene extends Phaser.Scene {

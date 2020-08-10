@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import StatusBar from '~/statusBar/StatusBar';
-import MissileContainer from '../attackMissile/MissileContainer';
-import TILES from '../scenes/tileMapping';
-import {createFloatingText} from '../scenes/UIScene/UIFunctions';
+import MissileContainer from '../../attackMissile/MissileContainer';
+import TILES from '../../scenes/tileMapping';
+import {createFloatingText} from '../../scenes/UIScene/UIFunctions';
+import { animsKeys } from '~/anims/animsKeys';
 
 enum Direction {
     UP, DOWN, LEFT, RIGHT
@@ -32,7 +33,7 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string, frame?: number | string) {
         super(scene, x, y, texture, frame);
-        this.anims.play('tentacle-anim');
+        this.anims.play(animsKeys.TENTACLE.move);
         scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_COLLIDE, this.dealPhysicalDamage, this)
 
         // this.moveEvent = scene.time.addEvent({
@@ -68,7 +69,7 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
     }
     private missileTileCollisionHandler(missile) {
         const dmg = this.dealDamage();
-        this.scene.player.takeDamage(dmg);
+        this.scene['player'].takeDamage(dmg);
         this.hitWithMissile(missile);
         return;
     }
@@ -92,11 +93,11 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
         createFloatingText(this.scene,this.x - 8, this.y - 30, dmg, 0xFFFFFF, null);
         if (this.hp <= 0 && !this.dead) {
             this.dead = true;
-            this.anims.play('deadTentacle');
+            this.anims.play(animsKeys.TENTACLE.dead);
             this.deadSound.play();
             this.on('animationcomplete', (animation) => {
-                if (animation.key === 'deadTentacle') {
-                    this.scene.player.updatePlayerExp(this.exp);
+                if (animation.key === animsKeys.TENTACLE.dead) {
+                    this.scene['player'].updatePlayerExp(this.exp);
                     this.destroy();
                 }
             });
@@ -180,7 +181,7 @@ export default class Tentacle extends Phaser.Physics.Arcade.Sprite {
         this.hpBar.x = this.body.position.x;
         this.hpBar.y = this.body.position.y;
         this.hpBar.update(time, delta);
-        if (!this.scene.player.dead) this.autoAttackHandler();
+        if (!this.scene['player'].dead) this.autoAttackHandler();
     }
 
     destroy(fromScene?: boolean) {

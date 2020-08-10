@@ -2,10 +2,9 @@ import Phaser from "phaser";
 import PlayerCursor from "./PlayerCursor";
 import StatusBar from "../statusBar/StatusBar";
 import MissileContainer from "../attackMissile/MissileContainer";
-import TILES from "../scenes/tileMapping";
 import {createFloatingText} from "../scenes/UIScene/UIFunctions";
-
 import eventsCenter from "../events/eventsCenter";
+import { animsKeys } from '~/anims/animsKeys';
 
 // /**
 //  * A class that wraps up our 2D platforming sprite logic. It creates, animates and moves a sprite in
@@ -141,7 +140,7 @@ export default class Player {
     this.hpBar.decrease(dmg);
     if (this.hp <= 0 && !this.dead) {
       this.deadSound.play();
-      this.sprite.anims.play("player-dead", true);
+      this.sprite.anims.play(animsKeys.PLAYER.dead, true);
       this.destroy();
       return;
     }
@@ -195,7 +194,7 @@ export default class Player {
       scene.time.now > this.nextAttack &&
       !this.dead
     ) {
-      sprite.anims.play("player-attack", true);
+      sprite.anims.play(animsKeys.PLAYER.attack, true);
       this.attackHandler();
     }
 
@@ -206,10 +205,10 @@ export default class Player {
     if (keys.left.isDown) {
       sprite.setVelocityX(-spriteSpeed);
       sprite.setFlipX(true);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (keys.right.isDown) {
       sprite.setVelocityX(spriteSpeed);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
       sprite.setFlipX(false);
     }
     // Vertical movement
@@ -223,38 +222,38 @@ export default class Player {
       sprite.setVelocityY(-spriteSpeed);
       sprite.setVelocityX(-spriteSpeed);
       sprite.setFlipX(true);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (keys.W.isDown && keys.D.isDown) {
       sprite.setVelocityY(-spriteSpeed);
       sprite.setVelocityX(spriteSpeed);
       sprite.setFlipX(false);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (keys.D.isDown && keys.S.isDown) {
       sprite.setVelocityX(spriteSpeed);
       sprite.setVelocityY(spriteSpeed);
       sprite.setFlipX(false);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (keys.A.isDown && keys.S.isDown) {
       sprite.setVelocityX(-spriteSpeed);
       sprite.setVelocityY(spriteSpeed);
       sprite.setFlipX(true);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (keys.W.isDown) {
       sprite.setVelocityY(-spriteSpeed);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (keys.S.isDown) {
       sprite.setVelocityY(spriteSpeed);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (keys.A.isDown) {
       sprite.setVelocityX(-spriteSpeed);
       sprite.setFlipX(true);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (keys.D.isDown) {
       sprite.setVelocityX(spriteSpeed);
       sprite.setFlipX(false);
-      sprite.anims.play("player-walk", true);
+      sprite.anims.play(animsKeys.PLAYER.move, true);
     } else if (!scene.input.activePointer.isDown) {
-      sprite.anims.play("player-stand", true);
+      sprite.anims.play(animsKeys.PLAYER.stand, true);
     }
 
     sprite.body.velocity.normalize().scale(spriteSpeed);
