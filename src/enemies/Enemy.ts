@@ -3,6 +3,7 @@ import StatusBar from "~/statusBar/StatusBar";
 import MissileContainer from "../attackMissile/MissileContainer";
 import { createFloatingText } from "../scenes/UIScene/UIFunctions";
 import { animsKeys } from '~/anims/animsKeys';
+import Player from '~/Player/Player';
 
 enum Direction {
   UP,
@@ -70,8 +71,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       scene.physics.add.overlap(
         this.missiles,
         scene["player"].sprite,
-        (player, missile) => {
-          this.hitPlayerWithMissile(missile);
+        (playerSprite, missile) => {
+          this.hitPlayerWithMissile(missile, playerSprite);
         }
       );
       scene.physics.add.collider(
@@ -97,9 +98,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.deadSound = scene.sound.add("tentacleDead", soundConfig);
   }
 
-  private hitPlayerWithMissile(missile) {
+  private hitPlayerWithMissile(missile, playerSprite) {
     const dmg = this.dealDamage();
-    this.scene["player"].takeDamage(dmg);
+    playerSprite.scene.player.takeDamage(dmg);
     this.destroyMissile(missile);
     return;
   }
@@ -130,19 +131,22 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.deadSound.play();
       this.on("animationcomplete", (animation) => {
         if (animation.key === this.animsKey['dead']) {
+          this.scene['player'].updatePlayerExp(this.exp);
           this.destroy();
         }
       });
-      //this.on('animationcomplete', this.destroy)
-      //this.scene.stuffLayer.putTileAtWorldXY(TILES.GREEN_BLOOD, this.x, this.y)
     }
+    //this.on('animationcomplete', this.destroy)
+    //this.scene.stuffLayer.putTileAtWorldXY(TILES.GREEN_BLOOD, this.x, this.y)
   }
+
 
   private destroyMissile = (missile) => {
     missile.destroy();
   };
 
   public autoRangedAttackHandler() {
+    if (this.scene['player'].dead || this.dead) return;
     if (this.scene.time.now >= this.nextAttack) {
       const player = this.scene["player"];
       const [playerX, playerY] = [
@@ -191,8 +195,9 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     return outDmg;
   }
 
-  private dealPhysicalDamage() {
-    if (this.scene.time.now >= this.scene.time.now + this.nextPhysicalAttack) {
+  public dealPhysicalDamage() {
+    if (this.scene['player'].dead || this.dead) return;
+    if (this.scene.time.now >= this.nextPhysicalAttack) {
       const dmg = this.attack * this.level;
       const outDmg = Phaser.Math.Between(dmg, 1.2 * dmg);
       this.nextPhysicalAttack = this.scene.time.now + this.fireRate;

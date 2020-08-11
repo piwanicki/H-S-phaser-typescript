@@ -29,11 +29,12 @@ export default class UglyThing extends Enemy {
             this.body['moves'] = false;
             return;
         }
+        Enemy.prototype.dealPhysicalDamage.call(this);
         this.scene.physics.moveTo(
             this,
             player.sprite.body.center.x,
             player.sprite.body.center.y,
-            100
+            this.speed
         );
         this.hpBar.x = this.body.position.x;
         this.hpBar.y = this.body.position.y;

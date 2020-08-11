@@ -40,6 +40,7 @@ export default class DungeonScene extends Phaser.Scene {
   };
 
   playerMissilesCollisionDmgHandler = (missile, enemy) => {
+    if(enemy.dead) return;
     const dmg = this.player.damageEnemy(missile);
     enemy.takeDamage(dmg);
   };

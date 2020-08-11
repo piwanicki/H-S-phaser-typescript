@@ -43,7 +43,7 @@ export default class Tentacle extends Enemy {
 
 
     update(time: number, delta: number) {
-        if (!this.scene['player'].dead) Enemy.prototype.autoRangedAttackHandler.call(this);
+        Enemy.prototype.autoRangedAttackHandler.call(this);
         this.hpBar.x = this.body.position.x;
         this.hpBar.y = this.body.position.y;
         this.hpBar.update(time, delta);
