@@ -68,7 +68,7 @@ export default class DungeonMap {
     scene: Phaser.Scene = this.scene,
     texture: string = "uglyThing"
   ) => {
-    const uglyThing = new UglyThing(scene, x, y, texture,animsKeys.UGLYTHING);
+    const uglyThing = new UglyThing(scene, x, y, texture);
     this.addEnemyInRoom(uglyThing);
   };
 

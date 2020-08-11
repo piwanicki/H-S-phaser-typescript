@@ -25,7 +25,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   public missiles?: Phaser.Physics.Arcade.Group;
   public missile?: MissileContainer;
   public missileKey?: string;
-  public animsKey!: string;
+  public animsKey!: Object;
   public range!: number;
   public dead: boolean = false;
   public hitSound!: Phaser.Sound.BaseSound;
@@ -38,12 +38,11 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     x: number,
     y: number,
     texture: string,
-    animsKey: string,
     ranged?: boolean,
     missileKey?: string,
     frame?: number | string
   ) {
-    super(scene, x, y, texture, frame );
+    super(scene, x, y, texture, frame);
 
     // scene.physics.world.on(
     //   Phaser.Physics.Arcade.Events.TILE_COLLIDE,
@@ -60,10 +59,8 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     //     //loop: true
     //     //}
     // })
-    this.animsKey = animsKey
-
-    this.hpBar = new StatusBar(scene, x, y, this.hp);
     scene.physics.add.existing(this);
+    scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_OVERLAP, this.dealPhysicalDamage, this)
 
     if (ranged) {
       this.missiles = this.scene.physics.add.group({
@@ -107,12 +104,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     return;
   }
 
-  // private tileCollisionHandler(gameObj: Phaser.GameObjects.GameObject, tile: Phaser.Tilemaps.Tile) {
+  // public tileCollisionHandler(gameObj: Phaser.GameObjects.GameObject, tile: Phaser.Tilemaps.Tile) {
   //     if (gameObj !== this) return;
   //     this.direction = this.randomDirection(this.direction);
   // }
 
-  // private randomDirection(exclude: Direction) {
+  // public randomDirection(exclude: Direction) {
   //     let newDirection = Phaser.Math.Between(0, 3);
   //     while (newDirection === exclude) {
   //         newDirection = Phaser.Math.Between(0, 3);
@@ -123,13 +120,16 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   private takeDamage(dmg: number) {
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
-    createFloatingText(this.scene, this.x - 8, this.y - 30, dmg, null, null);
+    if (this.hp > 0) createFloatingText(this.scene, this.x - 8, this.y - 30, dmg, 0xFFFFFF, null);
     if (this.hp <= 0 && !this.dead) {
+      this.body['moves'] = false;
+      this.body.onOverlap = false;
+      this.body.onCollide = false;
       this.dead = true;
-      this.anims.play(animsKeys[this.animsKey].dead);
+      this.anims.play(this.animsKey['dead']);
       this.deadSound.play();
       this.on("animationcomplete", (animation) => {
-        if (animation.key === animsKeys[this.animsKey].dead) {
+        if (animation.key === this.animsKey['dead']) {
           this.destroy();
         }
       });
@@ -142,7 +142,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     missile.destroy();
   };
 
-  private autoRangedAttackHandler() {
+  public autoRangedAttackHandler() {
     if (this.scene.time.now >= this.nextAttack) {
       const player = this.scene["player"];
       const [playerX, playerY] = [
@@ -201,34 +201,27 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-//   preUpdate(time: number, delta: number) {
-//     super.preUpdate(time, delta);
+  //   preUpdate(time: number, delta: number) {
+  //     super.preUpdate(time, delta);
 
-//     // switch (this.direction) {
-//     //     case Direction.UP: {
-//     //         this.setVelocity(0, -this.speed)
-//     //         break;
-//     //     }
-//     //     case Direction.DOWN: {
-//     //         this.setVelocity(0, this.speed)
-//     //         break;
-//     //     }
-//     //     case Direction.LEFT: {
-//     //         this.setVelocity(-this.speed, 0)
-//     //         break;
-//     //     }
-//     //     case Direction.RIGHT: {
-//     //         this.setVelocity(this.speed, 0)
-//     //     }
-//     // }
-//   }
-
-  update(time: number, delta: number) {
-    if (this.dead) return;
-    this.hpBar.x = this.body.position.x;
-    this.hpBar.y = this.body.position.y;
-    this.hpBar.update(time, delta);
-  }
+  //     // switch (this.direction) {
+  //     //     case Direction.UP: {
+  //     //         this.setVelocity(0, -this.speed)
+  //     //         break;
+  //     //     }
+  //     //     case Direction.DOWN: {
+  //     //         this.setVelocity(0, this.speed)
+  //     //         break;
+  //     //     }
+  //     //     case Direction.LEFT: {
+  //     //         this.setVelocity(-this.speed, 0)
+  //     //         break;
+  //     //     }
+  //     //     case Direction.RIGHT: {
+  //     //         this.setVelocity(this.speed, 0)
+  //     //     }
+  //     // }
+  //   }
 
   destroy(fromScene?: boolean) {
     //this.moveEvent.destroy();

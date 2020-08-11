@@ -1,3 +1,4 @@
+
 export const animsKeys = {
   PLAYER: {
     stand: "player-stand",

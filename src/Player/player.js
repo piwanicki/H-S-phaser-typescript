@@ -4,7 +4,7 @@ import StatusBar from "../statusBar/StatusBar";
 import MissileContainer from "../attackMissile/MissileContainer";
 import {createFloatingText} from "../scenes/UIScene/UIFunctions";
 import eventsCenter from "../events/eventsCenter";
-import { animsKeys } from '~/anims/animsKeys';
+import {animsKeys} from "~/anims/animsKeys";
 
 // /**
 //  * A class that wraps up our 2D platforming sprite logic. It creates, animates and moves a sprite in
@@ -75,16 +75,6 @@ export default class Player {
       this.scene.trees,
       this.hitWithMissile
     );
-
-    // this.scene.physics.add.overlap(
-    //   this.missiles,
-    //   this.scene.enemies,
-    //   this.damageEnemy
-    // );
-
-    // this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-    //   this.input.keyboard.off("keydown_SPACE");
-    // });
   }
 
   attackHandler = () => {
@@ -139,6 +129,7 @@ export default class Player {
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
     if (this.hp <= 0 && !this.dead) {
+      this.dead = true;
       this.deadSound.play();
       this.sprite.anims.play(animsKeys.PLAYER.dead, true);
       this.destroy();
@@ -259,7 +250,6 @@ export default class Player {
     sprite.body.velocity.normalize().scale(spriteSpeed);
     this.hpBar.x = sprite.body.position.x;
     this.hpBar.y = sprite.body.position.y;
-
     this.hpBar.update();
 
     //     // Update the animation/texture based on the state of the sprite
@@ -273,8 +263,6 @@ export default class Player {
   }
 
   destroy() {
-    //this.sprite.setActive(false).setVisible(false);
     this.freeze();
-    this.dead = true;
   }
 }
