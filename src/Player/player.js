@@ -22,7 +22,7 @@ export default class Player {
   damageTime = 300;
   dead = false;
   level = 1;
-  exp = 0;
+  exp = 90;
   nextLevelExp = 100 * (this.level * Math.pow(this.level, 2));
 
   constructor(scene, sprite, x, y, playerCursorSprite, scale = 1) {
@@ -36,6 +36,7 @@ export default class Player {
     this.missiles = scene.physics.add.group();
     this.inventory = {};
     this.hp = 200;
+    this.maxHp = this.hp;
     this.mana = 100;
     this.hpBar = new StatusBar(
       this.scene,
@@ -119,6 +120,7 @@ export default class Player {
 
   takeDamage = (dmg) => {
     if (!dmg) return;
+    eventsCenter.emit("UI_update", this);
     createFloatingText(
       this.scene,
       this.sprite.body.x + 8,
@@ -149,13 +151,17 @@ export default class Player {
 
   updatePlayerExp = (exp) => {
     this.exp += exp;
+    eventsCenter.emit("UI_update", this);
     if (this.exp >= this.nextLevelExp) {
       this.level++;
       this.nextLevelExp = 100 * Math.pow(this.level, 2);
       this.attack += 2;
+      this.maxHp += 20;
+      this.hp = this.maxHp; 
+      this.hpBar.maxValue = this.maxHp;
       createFloatingText(
         this.scene,
-        this.sprite.body.x,
+        this.sprite.body.x - 16,
         this.sprite.body.center.y - 30,
         `Level UP!`,
         0xffa500
@@ -166,7 +172,8 @@ export default class Player {
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
-    eventsCenter.emit("UI_update", this);
+
+    console.log(this)
 
     if (this.dead) {
       return;

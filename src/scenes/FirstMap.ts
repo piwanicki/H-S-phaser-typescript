@@ -194,8 +194,8 @@ export default class FirstMap extends Phaser.Scene {
             this.player.freeze();
             camera.fade(250, 0, 0, 0);
             camera.once('camerafadeoutcomplete', () => {
-                this.player.destroy();
-                this.scene.start(scenesKeys.scenes.DUNGEON);
+                this.scene.start(scenesKeys.scenes.DUNGEON, this.player);
+                //this.player.destroy();
                 this.playerInDungeon = true;
                 music.pause();
             });
@@ -207,8 +207,8 @@ export default class FirstMap extends Phaser.Scene {
             this.player.freeze();
             camera.fade(250, 0, 0, 0);
             camera.once('camerafadeoutcomplete', () => {
-                this.player.destroy();
-                this.scene.start(scenesKeys.scenes.DUNGEON);
+                this.scene.start(scenesKeys.scenes.DUNGEON, this.player);
+                //this.player.destroy();
                 this.playerInDungeon = true;
                 music.pause();
             });

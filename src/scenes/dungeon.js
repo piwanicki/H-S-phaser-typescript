@@ -9,12 +9,7 @@ import { scenesKeys } from "./scenesKeys";
 import DungeonMap from "./dungeon/dungeonGenerator";
 
 export default class DungeonScene extends Phaser.Scene {
-  constructor() {
-    super(scenesKeys.scenes.DUNGEON);
-    // Constructor is called once when the scene is created for the first time. When the scene is
-    // stopped/started (or restarted), the constructor will NOT be called again.
-    this.level = 1;
-  }
+
   player;
   dungeon;
   dungeonMap;
@@ -31,6 +26,14 @@ export default class DungeonScene extends Phaser.Scene {
   tilemap;
   tilesetStuff;
 
+  constructor() {
+    super(scenesKeys.scenes.DUNGEON);
+    // Constructor is called once when the scene is created for the first time. When the scene is
+    // stopped/started (or restarted), the constructor will NOT be called again.
+    this.level = 1;
+  }
+
+
   enemyCollisionDmgHandler = (enemy) => {
     const dmg = enemy.dealPhysicalDamage();
     //const dx = this.player.sprite.x - enemy.x;
@@ -44,6 +47,12 @@ export default class DungeonScene extends Phaser.Scene {
     const dmg = this.player.damageEnemy(missile);
     enemy.takeDamage(dmg);
   };
+
+  init(data) {
+    const player = data;
+    this.player  = player;
+    console.log(this.player)
+  }
 
   create() {
     this.levelComplete = false;
@@ -99,7 +108,7 @@ export default class DungeonScene extends Phaser.Scene {
       "stuffLayer",
       this.tilesetStuff
     );
-    this.player = new Player(this, "player", 0, 0);
+    //this.player = new Player(this, "player", 0, 0);
     this.dungeonMap = new DungeonMap(this);
     this.dungeon = this.dungeonMap.generateMap();
 
@@ -184,8 +193,8 @@ export default class DungeonScene extends Phaser.Scene {
           camera.fade(250, 0, 0, 0);
           camera.once("camerafadeoutcomplete", () => {
             music.pause();
+            this.scene.restart(this.player);
             this.player.destroy();
-            this.scene.restart();
           });
         }
       }
@@ -199,7 +208,8 @@ export default class DungeonScene extends Phaser.Scene {
 
   update(time, delta) {
     if (this.levelComplete || this.backToSurface) return;
-    this.player.update();
+
+    //this.player.update();
 
     // Find the player's room using another helper method from the dungeon that converts from dungeon XY (in grid units) to the corresponding room instance
     const playerTileX = this.groundLayer.worldToTileX(this.player.sprite.x);
@@ -214,6 +224,9 @@ export default class DungeonScene extends Phaser.Scene {
       const enemyRoom = this.dungeon.getRoomAt(enemyTileX, enemyTileY);
       if (enemyRoom === playerRoom) {
         enemy.update();
+        enemy.hpBar.bar.setVisible(true);
+      } else {
+        enemy.hpBar.bar.setVisible(false);
       }
     });
   }
