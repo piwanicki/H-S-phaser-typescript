@@ -3,8 +3,7 @@ import Player from '../Player/Player';
 import TILES from './tileMapping';
 import createPlayerAnims from '../anims/player-anims';
 import { scenesKeys } from './scenesKeys';
-
-
+import eventsCenter from '../events/eventsCenter'
 
 export default class FirstMap extends Phaser.Scene {
     private background?: Phaser.GameObjects.TileSprite;
@@ -17,6 +16,8 @@ export default class FirstMap extends Phaser.Scene {
     //private water?: Phaser.Tilemaps.StaticTilemapLayer;
     private waterEdges?: Phaser.Physics.Arcade.StaticGroup;
     private layerDebugEnabled = false as Boolean;
+    private initData?: Object;
+    private wakeData?: Object;
     player; anims; water; enters;
     playerCursor; playerInDungeon;
     statusBar;
@@ -45,19 +46,31 @@ export default class FirstMap extends Phaser.Scene {
         waterEdge.body.setSize(sizeX, sizeY).setOffset(offstetX, offsetY);
     }
 
+
+    init(initData) {
+        if(Object.keys(initData).length > 0) {
+            this.initData = initData;
+        }
+    }
+
+    onWake(sys, data) {
+        console.log(sys,data)
+        this.wakeData = data;
+    }
+
     create() {
 
+        this.events.on('wake', this.onWake, this);
         const width = this.scale.width;
         const height = this.scale.height;
         this.playerInDungeon = false;
         createPlayerAnims(this.anims);
-
-
+        console.log(this.initData)
+        console.log(this.wakeData)
+  
         let music = this.sound.add("cityTheme");
         this.sound.pauseOnBlur = false;
         //music.play();
-
-        this.scene.run(scenesKeys.scenes.GAME_UI)
 
         const map = this.make.tilemap({ key: "map1" });
         const tilesetMap = map.addTilesetImage('dungeonSet', 'dungeonSet', 32, 32, 1, 2);
@@ -119,17 +132,22 @@ export default class FirstMap extends Phaser.Scene {
 
         // spawnPoint in Tiled
         const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
-        this.player = new Player(this, 'player', spawnPoint.x, spawnPoint.y);
-
-        this.player.sprite.setCollideWorldBounds(true);
-        this.player.sprite.body.setBoundsRectangle(
-            boundTop,
-            boundBottom,
-            boundLeft,
-            boundrRight
-        );
-
-        this.player.create();
+        if (this.wakeData !== undefined) {
+            this.player = this.wakeData!['PLAYER']
+            this.player.initPlayer(this);
+            console.log(this.player);
+        } else {
+            console.log(`new player`)
+            this.player = new Player(this, spawnPoint['x'], spawnPoint['y']);
+            this.player.sprite.setCollideWorldBounds(true);
+            this.player.sprite.body.setBoundsRectangle(
+                boundTop,
+                boundBottom,
+                boundLeft,
+                boundrRight
+            );
+            this.player.create();
+        }
 
         //  generate stones
         for (let i = 1; i < 15; i++) {
@@ -171,48 +189,46 @@ export default class FirstMap extends Phaser.Scene {
         camera.startFollow(this.player.sprite);
         camera.setDeadzone(175, 75)
 
-
         camera.setBounds(0, 0, this.ground?.width, this.ground?.height);
         // zoom settings
         camera.setZoom(2);
 
-        const text = this.add
-            .text(0, 16,
-                ['SlashYt demo', 'Use Arrows or WSAD to move'], {
-                font: "18px monospace",
-                fill: "#000000",
-                padding: { x: 20, y: 10 },
-                backgroundColor: "#ffffff",
-                align: "center",
-            })
-            .setScrollFactor(0);
+        // const text = this.add
+        //     .text(0, 16,
+        //         ['SlashYt demo', 'Use Arrows or WSAD to move'], {
+        //         font: "18px monospace",
+        //         fill: "#000000",
+        //         padding: { x: 20, y: 10 },
+        //         backgroundColor: "#ffffff",
+        //         align: "center",
+        //     })
+        //     .setScrollFactor(0);
 
         // add tileIndex callback
         this.enters.setTileIndexCallback(TILES.DUNG_ENTER, () => {
-            console.log(`dung enter`);
             this.enters.setTileIndexCallback(TILES.DUNG_ENTER, null);
             this.player.freeze();
             camera.fade(250, 0, 0, 0);
             camera.once('camerafadeoutcomplete', () => {
-                this.scene.start(scenesKeys.scenes.DUNGEON, this.player);
-                //this.player.destroy();
+                this.scene.launch(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
+                this.scene.sleep();
                 this.playerInDungeon = true;
                 music.pause();
             });
         })
         // add tileIndex callback
         this.enters.setTileIndexCallback(TILES.DUNG_ENTER2, () => {
-            console.log(`dung enter2`);
             this.enters.setTileIndexCallback(TILES.DUNG_ENTER, null);
             this.player.freeze();
             camera.fade(250, 0, 0, 0);
             camera.once('camerafadeoutcomplete', () => {
-                this.scene.start(scenesKeys.scenes.DUNGEON, this.player);
-                //this.player.destroy();
+                this.scene.launch(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
+                this.scene.sleep();
                 this.playerInDungeon = true;
                 music.pause();
             });
         })
+
     }
 
     update(time, delta) {

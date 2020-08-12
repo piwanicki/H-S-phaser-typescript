@@ -25,26 +25,42 @@ export default class Player {
   exp = 90;
   nextLevelExp = 100 * (this.level * Math.pow(this.level, 2));
 
-  constructor(scene, sprite, x, y, playerCursorSprite, scale = 1) {
+  constructor(scene, x, y, playerCursorSprite, scale = 1) {
     this.scene = scene;
-    this.sprite = scene.physics.add
-      .sprite(x, y, sprite, 0)
-      .setDrag(1000, 0)
-      .setMaxVelocity(300, 400)
-      .setScale(scale);
+    this.x = x;
+    this.y = y;
     this.playerCursorSprite = playerCursorSprite;
-    this.missiles = scene.physics.add.group();
     this.inventory = {};
     this.hp = 200;
     this.maxHp = this.hp;
     this.mana = 100;
+    this.maxMana = this.mana;
+    this.playerCursor = new PlayerCursor(this.scene, this.playerCursorSprite);
+
+    this.hitSound = scene.sound.add("playerHit");
+    this.deadSound = scene.sound.add("playerDead");
+    this.initPlayer(scene);
+  }
+
+  preUpdate(time, delta) {
+    super.preUpdate(time, delta);
+  }
+
+  initPlayer = (scene) => {
+    this.scene = scene;
+    this.sprite = scene.physics.add
+      .sprite(this.x, this.y, "player", 0)
+      .setDrag(1000, 0)
+      .setMaxVelocity(300, 400);
+
+    this.missiles = scene.physics.add.group();
     this.hpBar = new StatusBar(
       this.scene,
       this.sprite.x,
       this.sprite.y,
       this.hp
     );
-    this.playerCursor = new PlayerCursor(this.scene, this.playerCursorSprite);
+    this.sprite.body.moves = true;
     // Track the arrow keys & WASD
     const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;
     this.keys = scene.input.keyboard.addKeys({
@@ -57,14 +73,8 @@ export default class Player {
       D: D,
       S: S,
     });
-
-    this.hitSound = scene.sound.add("playerHit");
-    this.deadSound = scene.sound.add("playerDead");
-  }
-
-  preUpdate(time, delta) {
-    super.preUpdate(time, delta);
-  }
+    eventsCenter.emit("UI_update", this);
+  };
 
   create() {
     this.missiles = this.scene.physics.add.group({
@@ -76,6 +86,9 @@ export default class Player {
       this.scene.trees,
       this.hitWithMissile
     );
+
+    this.sprite.body.moves = true;
+    eventsCenter.emit("UI_update", this);
   }
 
   attackHandler = () => {
@@ -120,7 +133,6 @@ export default class Player {
 
   takeDamage = (dmg) => {
     if (!dmg) return;
-    eventsCenter.emit("UI_update", this);
     createFloatingText(
       this.scene,
       this.sprite.body.x + 8,
@@ -130,6 +142,7 @@ export default class Player {
     );
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
+    eventsCenter.emit("UI_update", this);
     if (this.hp <= 0 && !this.dead) {
       this.dead = true;
       this.deadSound.play();
@@ -151,14 +164,16 @@ export default class Player {
 
   updatePlayerExp = (exp) => {
     this.exp += exp;
-    eventsCenter.emit("UI_update", this);
     if (this.exp >= this.nextLevelExp) {
       this.level++;
       this.nextLevelExp = 100 * Math.pow(this.level, 2);
       this.attack += 2;
       this.maxHp += 20;
-      this.hp = this.maxHp; 
+      this.hp = this.maxHp;
+      this.hpBar.value = this.hp;
       this.hpBar.maxValue = this.maxHp;
+      this.maxMana += 10;
+      this.mana = this.maxMana;
       createFloatingText(
         this.scene,
         this.sprite.body.x - 16,
@@ -167,13 +182,12 @@ export default class Player {
         0xffa500
       );
     }
+    eventsCenter.emit("UI_update", this);
   };
 
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
-
-    console.log(this)
 
     if (this.dead) {
       return;

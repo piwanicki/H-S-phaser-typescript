@@ -1,15 +1,15 @@
 import Phaser from "phaser";
-import Player from "../Player/Player";
 import TILES from "./tileMapping";
 import TilemapVisibility from "./TilemapVisibility";
 import createTentacleAnims from "../anims/tentacle-anims";
 import createPlayerAnims from "../anims/player-anims";
 import createUglyThingAnims from "../anims/uglyThing-anims";
-import { scenesKeys } from "./scenesKeys";
+import {scenesKeys} from "./scenesKeys";
 import DungeonMap from "./dungeon/dungeonGenerator";
+import eventsCenter from "../events/eventsCenter";
 
 export default class DungeonScene extends Phaser.Scene {
-
+  initData;
   player;
   dungeon;
   dungeonMap;
@@ -33,7 +33,6 @@ export default class DungeonScene extends Phaser.Scene {
     this.level = 1;
   }
 
-
   enemyCollisionDmgHandler = (enemy) => {
     const dmg = enemy.dealPhysicalDamage();
     //const dx = this.player.sprite.x - enemy.x;
@@ -43,15 +42,13 @@ export default class DungeonScene extends Phaser.Scene {
   };
 
   playerMissilesCollisionDmgHandler = (missile, enemy) => {
-    if(enemy.dead) return;
+    if (enemy.dead) return;
     const dmg = this.player.damageEnemy(missile);
     enemy.takeDamage(dmg);
   };
 
   init(data) {
-    const player = data;
-    this.player  = player;
-    console.log(this.player)
+    this.initData = data;
   }
 
   create() {
@@ -108,7 +105,9 @@ export default class DungeonScene extends Phaser.Scene {
       "stuffLayer",
       this.tilesetStuff
     );
-    //this.player = new Player(this, "player", 0, 0);
+
+    this.player = this.initData.PLAYER;
+    this.player.initPlayer(this);
     this.dungeonMap = new DungeonMap(this);
     this.dungeon = this.dungeonMap.generateMap();
 
@@ -182,9 +181,10 @@ export default class DungeonScene extends Phaser.Scene {
           this.player.freeze();
           camera.fade(250, 0, 0, 0);
           camera.once("camerafadeoutcomplete", () => {
-            this.player.destroy();
-            this.scene.start(scenesKeys.scenes.CITY);
+            //.player.destroy();
             music.pause();
+            this.scene.wake(scenesKeys.scenes.CITY, {PLAYER: this.player});
+            this.scene.switch(scenesKeys.scenes.CITY);
           });
         } else {
           this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);
@@ -208,8 +208,7 @@ export default class DungeonScene extends Phaser.Scene {
 
   update(time, delta) {
     if (this.levelComplete || this.backToSurface) return;
-
-    //this.player.update();
+    this.player.update();
 
     // Find the player's room using another helper method from the dungeon that converts from dungeon XY (in grid units) to the corresponding room instance
     const playerTileX = this.groundLayer.worldToTileX(this.player.sprite.x);

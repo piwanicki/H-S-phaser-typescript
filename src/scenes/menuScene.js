@@ -8,13 +8,7 @@ export default class MenuScene extends Phaser.Scene {
     super(scenesKeys.scenes.MENU);
   }
 
-  init(data) {
-    console.log(data);
-  }
-
   create() {
-    //this.add.image(0,0,'menuBackground').setOrigin(0);
-
     // scale and stretch background image
     let backgroundImage = this.add.image(
       this.cameras.main.width / 2,
@@ -70,6 +64,7 @@ export default class MenuScene extends Phaser.Scene {
     this.newGameBtn.on("pointerdown", () => {
       this.cameras.main.fade(250, 0, 0, 0);
       this.cameras.main.once("camerafadeoutcomplete", () => {
+        this.scene.launch(scenesKeys.scenes.GAME_UI);
         this.scene.start(scenesKeys.scenes.CITY);
         music.pause();
       });

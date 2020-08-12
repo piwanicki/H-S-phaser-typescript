@@ -103,7 +103,10 @@ export class LoadingScene extends Phaser.Scene {
 
     // loading dungeon scene preload()
     this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
-    this.load.image("dungeonTileset", "assets/tilemaps/Dungeon_Tileset_extruded.png");
+    this.load.image(
+      "dungeonTileset",
+      "assets/tilemaps/Dungeon_Tileset_extruded.png"
+    );
     this.load.image("dungeon2", "assets/tilemaps/dungeon_extruder.png");
     // this.load.spritesheet("player", "assets/images/player/deep_elf_male.png", {
     //   frameWidth: 32,
@@ -112,27 +115,38 @@ export class LoadingScene extends Phaser.Scene {
     //   spacing: 0,
     // });
 
- this.load.spritesheet("player", "assets/images/player/ranger_spritesheet.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-      margin: 0,
-      spacing: 0,
-    });
+    this.load.spritesheet(
+      "player",
+      "assets/images/player/ranger_spritesheet.png",
+      {
+        frameWidth: 32,
+        frameHeight: 32,
+        margin: 0,
+        spacing: 0,
+      }
+    );
 
-    this.load.spritesheet("player-warrior", "assets/images/player/warrior_spritesheet.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-      margin: 0,
-      spacing: 0,
-    });
+    this.load.spritesheet(
+      "player-warrior",
+      "assets/images/player/warrior_spritesheet.png",
+      {
+        frameWidth: 32,
+        frameHeight: 32,
+        margin: 0,
+        spacing: 0,
+      }
+    );
 
-    this.load.spritesheet("player-thief", "assets/images/player/thief_spritesheet.png", {
-      frameWidth: 32,
-      frameHeight: 32,
-      margin: 0,
-      spacing: 0,
-    });
-
+    this.load.spritesheet(
+      "player-thief",
+      "assets/images/player/thief_spritesheet.png",
+      {
+        frameWidth: 32,
+        frameHeight: 32,
+        margin: 0,
+        spacing: 0,
+      }
+    );
 
     // tentacle
     this.load.spritesheet("tentacle", "assets/images/enemies/tentacle.png", {
@@ -175,9 +189,8 @@ export class LoadingScene extends Phaser.Scene {
     });
 
     this.load.on("complete", () => {
-      this.scene.start(scenesKeys.scenes.MENU, "data to pass into next scene");
-      //this.scene.start(scenesKeys.scenes.DUNGEON, "data to pass into next scene");
-      //this.scene.start('Game', "data to pass into next scene");
+      this.scene.start(scenesKeys.scenes.MENU);
+      //this.scene.start(scenesKeys.scenes.DUNGEON);
     });
   }
 

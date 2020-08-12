@@ -64,10 +64,10 @@ export default class GameUI extends Phaser.Scene {
         const playerHP = this.player.hp
         let p;
         if (playerHP > 0) {
-            this.playerHPText.text = `${playerHP} / ${this.player.hpBar.maxValue}`;
-            p = playerHP / this.player.hpBar.maxValue;
+            this.playerHPText.text = `${playerHP} / ${this.player.hpBar?.maxValue}`;
+            p = playerHP / this.player.hpBar?.maxValue;
         } else {
-            this.playerHPText.text = `0 / ${this.player.hpBar.maxValue}`
+            this.playerHPText.text = `0 / ${this.player.hpBar?.maxValue}`
             p = 0;
         }
         hpBar.width = 250 * p;
