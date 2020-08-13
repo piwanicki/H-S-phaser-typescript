@@ -126,8 +126,8 @@ export default class DungeonScene extends Phaser.Scene {
       this.player = this.initData.PLAYER;
       this.dungeonMap = new DungeonMap(this);
     }
-    this.dungeon = this.dungeonMap.generateMap();
     this.player.initPlayer(this);
+    this.dungeon = this.dungeonMap.generateMap();
 
     // Watch the player and layer for collisions, for the duration of the scene:
     this.physics.add.collider(this.player.sprite, this.wallsLayer);

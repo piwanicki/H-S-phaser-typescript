@@ -29,6 +29,7 @@ export default class DungeonMap {
       createCallback: (gameObj) => {
         const Obj = gameObj;
         Obj.body.onOverlap = true;
+        Obj.body.onCollide = true;
       },
     };
     this.enemies = new EnemyGroup(

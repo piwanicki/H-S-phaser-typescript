@@ -16,6 +16,7 @@ export default class Player {
   hitTintDuration = 0;
   missile;
   missiles;
+
   fireRate = 300;
   attack = 12;
   strength = 3;
@@ -33,10 +34,10 @@ export default class Player {
     this.inventory = {};
     this.hp = 200;
     this.maxHp = this.hp;
+    this.hpBar = new StatusBar(scene, this.x, this.y, this.maxHp);
     this.mana = 100;
     this.maxMana = this.mana;
     this.playerCursor = new PlayerCursor(this.scene, this.playerCursorSprite);
-    this.hpBar = new StatusBar(this.scene, this.x, this.y, this.hp);
     this.hitSound = scene.sound.add("playerHit");
     this.deadSound = scene.sound.add("playerDead");
     this.initPlayer(scene);
@@ -54,7 +55,7 @@ export default class Player {
       .setMaxVelocity(300, 400);
 
     this.missiles = scene.physics.add.group();
-
+    this.hpBar.init(scene);
     this.sprite.body.moves = true;
     // Track the arrow keys & WASD
     const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;

@@ -1,13 +1,16 @@
 export default class StatusBar {
   constructor(scene, x, y, value) {
-    this.bar = new Phaser.GameObjects.Graphics(scene);
-    this.scene = scene;
     this.x = x;
     this.y = y;
     this.value = value;
     this.maxValue = value;
+    this.init(scene);
+  }
+
+  init(scene) {
+    this.scene = scene;
+    this.bar = new Phaser.GameObjects.Graphics(scene);
     scene.add.existing(this.bar);
-    this.drawMiniHPBar();
   }
 
   decrease(amount) {

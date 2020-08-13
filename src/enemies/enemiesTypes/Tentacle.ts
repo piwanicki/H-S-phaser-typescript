@@ -39,6 +39,7 @@ export default class Tentacle extends Enemy {
 
         this.hitSound = scene.sound.add('tentacleHit');
         this.deadSound = scene.sound.add('tentacleDead');
+
     }
 
 

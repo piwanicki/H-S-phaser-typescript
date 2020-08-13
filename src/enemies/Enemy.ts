@@ -60,18 +60,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     //     //loop: true
     //     //}
     // })
-    scene.physics.add.existing(this);
-    scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_OVERLAP, this.dealPhysicalDamage, this)
-    scene.physics.add.collider(
-      this,
-      scene["wallsLayer"],
-    );
-
     if (ranged) {
-      this.missiles = this.scene.physics.add.group({
+      this.missiles = scene.physics.add.group({
         classType: MissileContainer,
       });
       this.missileKey = missileKey;
+
       scene.physics.add.overlap(
         this.missiles,
         scene["player"].sprite,
@@ -94,6 +88,14 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
       );
     }
+
+    scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_OVERLAP, this.dealPhysicalDamage, this)
+    scene.physics.add.collider(
+      this,
+      scene["wallsLayer"],
+    );
+
+    scene.physics.add.existing(this);
 
     const soundConfig = {
       volume: 0.2,
@@ -179,7 +181,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
           player.sprite.body.x + this.scene.cameras.main.scrollX,
           player.sprite.body.x + this.scene.cameras.main.scrollY
         );
-        this.missiles!.add(this.missile, false);
+        this.missiles!.add(this.missile);
         this.missile.angle = angle * 57.29;
         this.scene.physics.moveTo(
           this.missile,
