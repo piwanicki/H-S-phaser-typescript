@@ -25,6 +25,7 @@ export default class DungeonScene extends Phaser.Scene {
   enemies;
   tilemap;
   tilesetStuff;
+  dungeonMapJson;
 
   constructor() {
     super(scenesKeys.scenes.DUNGEON);
@@ -51,7 +52,17 @@ export default class DungeonScene extends Phaser.Scene {
     this.initData = data;
   }
 
+  onWake(sys, data) {
+    this.wakeData = data;
+  }
+
+  // onSleep(sys) {
+  // }
+
   create() {
+    this.events.on("wake", this.onWake, this);
+    //this.events.on("sleep", this.onSleep, this);
+
     this.levelComplete = false;
     this.backToSurface = false;
     createPlayerAnims(this.anims);
@@ -106,10 +117,17 @@ export default class DungeonScene extends Phaser.Scene {
       this.tilesetStuff
     );
 
-    this.player = this.initData.PLAYER;
-    this.player.initPlayer(this);
-    this.dungeonMap = new DungeonMap(this);
+    if (this.wakeData !== undefined) {
+      this.player = this.wakeData.PLAYER;
+      this.wakeData = undefined;
+      // need to save the whole dungeon config with stuff/enemies/ and redraw it isntead of generating a new one
+      //this.dungeonMap.generateMap();
+    } else {
+      this.player = this.initData.PLAYER;
+      this.dungeonMap = new DungeonMap(this);
+    }
     this.dungeon = this.dungeonMap.generateMap();
+    this.player.initPlayer(this);
 
     // Watch the player and layer for collisions, for the duration of the scene:
     this.physics.add.collider(this.player.sprite, this.wallsLayer);

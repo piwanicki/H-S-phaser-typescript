@@ -72,14 +72,220 @@ export default class DungeonMap {
     this.addEnemyInRoom(uglyThing);
   };
 
+  private getMap() {
+    return this.dungeon;
+  }
+
   private generateMap = () => {
-    const tilesetStuff = this.scene["tilesetStuff"];
-    const groundLayer = this.scene["groundLayer"];
+
     const wallsLayer = this.scene["wallsLayer"];
     const stuffLayer = this.scene["stuffLayer"];
-    const enemiesLayer = this.scene["enemiesLayer"];
     const map = this.scene["tilemap"];
     const player = this.scene["player"];
+    this.renderDungeon();
+
+    const rooms = this.dungeon.rooms.slice();
+    const startRoom = rooms.shift();
+    const endRoom = Phaser.Utils.Array.RemoveRandomElement(rooms);
+    const otherRooms = Phaser.Utils.Array.Shuffle(rooms).slice(
+      0,
+      rooms.length * 0.9
+    );
+
+    stuffLayer.putTileAt(
+      TILES.STAIRS_DOWN,
+      endRoom["centerX"],
+      endRoom["centerY"]
+    );
+    stuffLayer.putTileAt(
+      TILES.STAIRS_UP,
+      startRoom!.centerX - 2,
+      startRoom!.centerY
+    );
+
+    // Get a 2D array of tile indices (using -1 to not render empty tiles) and place them into the
+    // blank layer
+    // wall 1123-1126
+    //const mappedTiles = this.dungeon.getMappedTiles({
+    //  empty: -1,
+    //  floor: 105,
+    //  door: 1124,
+    //  wall: 1043,
+    //});
+    //groundLayer.putTilesAt(mappedTiles, 0, 0);
+
+    // We only need one tile index (the wallsLayer) to be colliding for now
+
+    // move collision to property in tiled
+    wallsLayer.setCollision(TILES.WALL.TOP);
+    wallsLayer.setCollision(TILES.WALL.BOTTOM);
+    wallsLayer.setCollision(TILES.WALL.LEFT);
+    wallsLayer.setCollision(TILES.WALL.RIGHT);
+
+    wallsLayer.setCollision(TILES.WALL.TOP_LEFT);
+    wallsLayer.setCollision(TILES.WALL.TOP_LEFT_1);
+    wallsLayer.setCollision(TILES.WALL.TOP_RIGHT);
+    wallsLayer.setCollision(TILES.WALL.TOP_RIGHT_1);
+    wallsLayer.setCollision(TILES.WALL.BOTTOM_LEFT);
+    wallsLayer.setCollision(TILES.WALL.BOTTOM_1);
+    wallsLayer.setCollision(TILES.WALL.BOTTOM_LEFT_1);
+    wallsLayer.setCollision(TILES.WALL.BOTTOM_RIGHT);
+    wallsLayer.setCollision(TILES.WALL.BOTTOM_RIGHT_1);
+
+    wallsLayer.setCollision(TILES.DOOR.LEFT_BOTTOM);
+    wallsLayer.setCollision(TILES.DOOR.RIGHT_BOTTOM);
+    wallsLayer.setCollision(TILES.DOOR.BOTTOM_LEFT);
+    wallsLayer.setCollision(TILES.DOOR.BOTTOM_RIGHT);
+    wallsLayer.setCollision(TILES.DOOR.LEFT_TOP);
+    wallsLayer.setCollision(TILES.DOOR.RIGHT_TOP);
+
+    //stuffLayer.setCollisionByProperty({collide: true});
+    stuffLayer.setCollision(TILES.FOUNTAIN);
+    stuffLayer.setCollision(TILES.TOWER);
+    stuffLayer.setCollision(TILES.CHEST);
+    stuffLayer.setCollision(TILES.STATUE_1);
+    stuffLayer.setCollision(TILES.STATUE_2);
+
+    // Place the player in the center of the map. This works because the Dungeon generator places
+    // the first room in the center of the map.
+
+    const playerRoom = startRoom;
+    const playerX = map.tileToWorldX(playerRoom!["centerX"]);
+    const playerY = map.tileToWorldY(playerRoom!["centerY"]);
+    player.sprite.x = playerX;
+    player.sprite.y = playerY;
+
+    // Place stuffLayer in the 90% "otherRooms"
+    otherRooms.forEach((room) => {
+      const rand = Math.random();
+      const roomCenterOnWorldMap = map.tileToWorldXY(
+        room.centerX,
+        room.centerY
+      );
+      if (rand <= 0.05) {
+        // 5% chance of HP
+        stuffLayer.putTileAt(TILES.HP, room.centerX, room.centerY);
+        this.createTentacle(
+          roomCenterOnWorldMap.x + 50,
+          roomCenterOnWorldMap.y + 50
+        );
+        this.createTentacle(
+          roomCenterOnWorldMap.x - 50,
+          roomCenterOnWorldMap.y + 50
+        );
+        this.createUglyThing(
+          roomCenterOnWorldMap.x + 90,
+          roomCenterOnWorldMap.y + 10
+        );
+      } else if (rand <= 0.1) {
+        // 10% chance of Mana
+        stuffLayer.putTileAt(TILES.MANA, room.centerX, room.centerY);
+        this.createTentacle(
+          roomCenterOnWorldMap.x + 50,
+          roomCenterOnWorldMap.y + 50
+        );
+        this.createUglyThing(
+          roomCenterOnWorldMap.x + 80,
+          roomCenterOnWorldMap.y + 80
+        );
+      } else if (rand <= 0.25) {
+        // 25% chance of chest
+        stuffLayer.putTileAt(TILES.CHEST, room.centerX, room.centerY);
+        this.createTentacle(
+          roomCenterOnWorldMap.x + 50,
+          roomCenterOnWorldMap.y + 50
+        );
+        this.createTentacle(
+          roomCenterOnWorldMap.x - 50,
+          roomCenterOnWorldMap.y + 50
+        );
+        this.createUglyThing(
+          roomCenterOnWorldMap.x + 100,
+          roomCenterOnWorldMap.y + 80
+        );
+      } else if (rand <= 0.5) {
+        // 50% chance of a pot anywhere in the room... except don't block a door!
+        const x = Phaser.Math.Between(room.left + 2, room.right - 2);
+        const y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
+        stuffLayer.putTileAt(TILES.PENTAGRAM, x, y);
+        this.createTentacle(
+          roomCenterOnWorldMap.x + 50,
+          roomCenterOnWorldMap.y + 50
+        );
+        this.createUglyThing(
+          roomCenterOnWorldMap.x + 100,
+          roomCenterOnWorldMap.y + 80
+        );
+      } else {
+        // 25% of either 2 or 4 towers, depending on the room size
+        if (room.height >= 9) {
+          stuffLayer.putTileAt(
+            TILES.STATUE_1,
+            room.centerX - 1,
+            room.centerY + 1
+          );
+          stuffLayer.putTileAt(
+            TILES.STATUE_1,
+            room.centerX - 1,
+            room.centerY - 2
+          );
+          stuffLayer.putTileAt(
+            TILES.STATUE_2,
+            room.centerX + 1,
+            room.centerY - 2
+          );
+
+          stuffLayer.putTileAt(
+            TILES.STATUE_2,
+            room.centerX + 1,
+            room.centerY + 1
+          );
+          this.createTentacle(
+            roomCenterOnWorldMap.x,
+            roomCenterOnWorldMap.y + 100
+          );
+          this.createTentacle(
+            roomCenterOnWorldMap.x,
+            roomCenterOnWorldMap.y - 100
+          );
+          this.createUglyThing(
+            roomCenterOnWorldMap.x,
+            roomCenterOnWorldMap.y
+          );
+          this.createUglyThing(
+            roomCenterOnWorldMap.x + 40,
+            roomCenterOnWorldMap.y
+          );
+        } else {
+          stuffLayer.putTileAt(
+            TILES.STATUE_1,
+            room.centerX - 1,
+            room.centerY - 1
+          );
+          stuffLayer.weightedRandomize(
+            TILES.STATUE_2,
+            room.centerX + 1,
+            room.centerY - 1
+          );
+          this.createTentacle(
+            roomCenterOnWorldMap.x,
+            roomCenterOnWorldMap.y + 50
+          );
+          this.createUglyThing(
+            roomCenterOnWorldMap.x + 80,
+            roomCenterOnWorldMap.y
+          );
+        }
+      }
+    });
+    return this.dungeon;
+  };
+
+
+  private renderDungeon() {
+
+    const groundLayer = this.scene["groundLayer"];
+    const wallsLayer = this.scene["wallsLayer"];
 
     this.dungeon.rooms.forEach((room) => {
       // destructuring
@@ -233,189 +439,5 @@ export default class DungeonMap {
       }
     });
 
-    const rooms = this.dungeon.rooms.slice();
-    const startRoom = rooms.shift();
-    const endRoom = Phaser.Utils.Array.RemoveRandomElement(rooms);
-    const otherRooms = Phaser.Utils.Array.Shuffle(rooms).slice(
-      0,
-      rooms.length * 0.9
-    );
-
-    stuffLayer.putTileAt(
-      TILES.STAIRS_DOWN,
-      endRoom["centerX"],
-      endRoom["centerY"]
-    );
-    stuffLayer.putTileAt(
-      TILES.STAIRS_UP,
-      startRoom!.centerX - 2,
-      startRoom!.centerY
-    );
-
-    // Get a 2D array of tile indices (using -1 to not render empty tiles) and place them into the
-    // blank layer
-    // wall 1123-1126
-    //const mappedTiles = this.dungeon.getMappedTiles({
-    //  empty: -1,
-    //  floor: 105,
-    //  door: 1124,
-    //  wall: 1043,
-    //});
-    //groundLayer.putTilesAt(mappedTiles, 0, 0);
-
-    // We only need one tile index (the wallsLayer) to be colliding for now
-
-    // move collision to property in tiled
-    wallsLayer.setCollision(TILES.WALL.TOP);
-    wallsLayer.setCollision(TILES.WALL.BOTTOM);
-    wallsLayer.setCollision(TILES.WALL.LEFT);
-    wallsLayer.setCollision(TILES.WALL.RIGHT);
-
-    wallsLayer.setCollision(TILES.WALL.TOP_LEFT);
-    wallsLayer.setCollision(TILES.WALL.TOP_LEFT_1);
-    wallsLayer.setCollision(TILES.WALL.TOP_RIGHT);
-    wallsLayer.setCollision(TILES.WALL.TOP_RIGHT_1);
-    wallsLayer.setCollision(TILES.WALL.BOTTOM_LEFT);
-    wallsLayer.setCollision(TILES.WALL.BOTTOM_1);
-    wallsLayer.setCollision(TILES.WALL.BOTTOM_LEFT_1);
-    wallsLayer.setCollision(TILES.WALL.BOTTOM_RIGHT);
-    wallsLayer.setCollision(TILES.WALL.BOTTOM_RIGHT_1);
-
-    wallsLayer.setCollision(TILES.DOOR.LEFT_BOTTOM);
-    wallsLayer.setCollision(TILES.DOOR.RIGHT_BOTTOM);
-    wallsLayer.setCollision(TILES.DOOR.BOTTOM_LEFT);
-    wallsLayer.setCollision(TILES.DOOR.BOTTOM_RIGHT);
-    wallsLayer.setCollision(TILES.DOOR.LEFT_TOP);
-    wallsLayer.setCollision(TILES.DOOR.RIGHT_TOP);
-
-    //stuffLayer.setCollisionByProperty({collide: true});
-    stuffLayer.setCollision(TILES.FOUNTAIN);
-    stuffLayer.setCollision(TILES.TOWER);
-    stuffLayer.setCollision(TILES.CHEST);
-    stuffLayer.setCollision(TILES.STATUE_1);
-    stuffLayer.setCollision(TILES.STATUE_2);
-
-    // Place the player in the center of the map. This works because the Dungeon generator places
-    // the first room in the center of the map.
-
-    const playerRoom = startRoom;
-    const playerX = map.tileToWorldX(playerRoom!["centerX"]);
-    const playerY = map.tileToWorldY(playerRoom!["centerY"]);
-    player.sprite.x = playerX;
-    player.sprite.y = playerY;
-    stuffLayer.putTileAt(
-      TILES.STAIRS_UP,
-      player.sprite.x + 50,
-      player.sprite.y
-    );
-
-    // Place stuffLayer in the 90% "otherRooms"
-    otherRooms.forEach((room) => {
-      const rand = Math.random();
-      const roomCenterOnWorldMap = map.tileToWorldXY(
-        room.centerX,
-        room.centerY
-      );
-      if (rand <= 0.05) {
-        // 5% chance of chest
-        stuffLayer.putTileAt(TILES.HP, room.centerX, room.centerY);
-        this.createTentacle(
-          roomCenterOnWorldMap.x + 50,
-          roomCenterOnWorldMap.y + 50
-        );
-        this.createUglyThing(
-          roomCenterOnWorldMap.x + 80,
-          roomCenterOnWorldMap.y + 80
-        );
-      } else if (rand <= 0.1) {
-        // 10% chance of Mana
-        stuffLayer.putTileAt(TILES.MANA, room.centerX, room.centerY);
-        this.createTentacle(
-          roomCenterOnWorldMap.x + 50,
-          roomCenterOnWorldMap.y + 50
-        );
-        this.createUglyThing(
-          roomCenterOnWorldMap.x + 80,
-          roomCenterOnWorldMap.y + 80
-        );
-      } else if (rand <= 0.25) {
-        // 25% chance of chest
-        stuffLayer.putTileAt(TILES.CHEST, room.centerX, room.centerY);
-        this.createTentacle(
-          roomCenterOnWorldMap.x + 50,
-          roomCenterOnWorldMap.y + 50
-        );
-        this.createUglyThing(
-          roomCenterOnWorldMap.x + 100,
-          roomCenterOnWorldMap.y + 80
-        );
-      } else if (rand <= 0.5) {
-        // 50% chance of a pot anywhere in the room... except don't block a door!
-        const x = Phaser.Math.Between(room.left + 2, room.right - 2);
-        const y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
-        stuffLayer.putTileAt(TILES.PENTAGRAM, x, y);
-        this.createTentacle(
-          roomCenterOnWorldMap.x + 50,
-          roomCenterOnWorldMap.y + 50
-        );
-        this.createUglyThing(
-          roomCenterOnWorldMap.x + 100,
-          roomCenterOnWorldMap.y + 80
-        );
-      } else {
-        // 25% of either 2 or 4 towers, depending on the room size
-        if (room.height >= 9) {
-          stuffLayer.putTileAt(
-            TILES.STATUE_1,
-            room.centerX - 1,
-            room.centerY + 1
-          );
-          stuffLayer.putTileAt(
-            TILES.STATUE_1,
-            room.centerX - 1,
-            room.centerY - 2
-          );
-          stuffLayer.putTileAt(
-            TILES.STATUE_2,
-            room.centerX + 1,
-            room.centerY - 2
-          );
-
-          stuffLayer.putTileAt(
-            TILES.STATUE_2,
-            room.centerX + 1,
-            room.centerY + 1
-          );
-          this.createTentacle(
-            roomCenterOnWorldMap.x + 50,
-            roomCenterOnWorldMap.y + 50
-          );
-          this.createUglyThing(
-            roomCenterOnWorldMap.x + 80,
-            roomCenterOnWorldMap.y
-          );
-        } else {
-          stuffLayer.putTileAt(
-            TILES.STATUE_1,
-            room.centerX - 1,
-            room.centerY - 1
-          );
-          stuffLayer.weightedRandomize(
-            TILES.STATUE_2,
-            room.centerX + 1,
-            room.centerY - 1
-          );
-          this.createTentacle(
-            roomCenterOnWorldMap.x + 50,
-            roomCenterOnWorldMap.y + 50
-          );
-          this.createUglyThing(
-            roomCenterOnWorldMap.x + 80,
-            roomCenterOnWorldMap.y + 80
-          );
-        }
-      }
-    });
-    return this.dungeon;
-  };
+  }
 }

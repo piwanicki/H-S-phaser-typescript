@@ -62,6 +62,10 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
     // })
     scene.physics.add.existing(this);
     scene.physics.world.on(Phaser.Physics.Arcade.Events.TILE_OVERLAP, this.dealPhysicalDamage, this)
+    scene.physics.add.collider(
+      this,
+      scene["wallsLayer"],
+    );
 
     if (ranged) {
       this.missiles = this.scene.physics.add.group({

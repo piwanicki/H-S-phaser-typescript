@@ -48,13 +48,12 @@ export default class FirstMap extends Phaser.Scene {
 
 
     init(initData) {
-        if(Object.keys(initData).length > 0) {
+        if (Object.keys(initData).length > 0) {
             this.initData = initData;
         }
     }
 
     onWake(sys, data) {
-        console.log(sys,data)
         this.wakeData = data;
     }
 
@@ -65,9 +64,7 @@ export default class FirstMap extends Phaser.Scene {
         const height = this.scale.height;
         this.playerInDungeon = false;
         createPlayerAnims(this.anims);
-        console.log(this.initData)
-        console.log(this.wakeData)
-  
+
         let music = this.sound.add("cityTheme");
         this.sound.pauseOnBlur = false;
         //music.play();
@@ -135,9 +132,7 @@ export default class FirstMap extends Phaser.Scene {
         if (this.wakeData !== undefined) {
             this.player = this.wakeData!['PLAYER']
             this.player.initPlayer(this);
-            console.log(this.player);
         } else {
-            console.log(`new player`)
             this.player = new Player(this, spawnPoint['x'], spawnPoint['y']);
             this.player.sprite.setCollideWorldBounds(true);
             this.player.sprite.body.setBoundsRectangle(
@@ -181,6 +176,13 @@ export default class FirstMap extends Phaser.Scene {
         this.physics.add.collider(this.paths, this.player.sprite);
         this.physics.add.collider(this.enters, this.player.sprite);
 
+        this.physics.add.overlap(
+            this.player.missiles,
+            this.trees,
+            this.player.hitWithMissile
+        );
+
+
         // add keys
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -205,25 +207,17 @@ export default class FirstMap extends Phaser.Scene {
         //     .setScrollFactor(0);
 
         // add tileIndex callback
-        this.enters.setTileIndexCallback(TILES.DUNG_ENTER, () => {
-            this.enters.setTileIndexCallback(TILES.DUNG_ENTER, null);
-            this.player.freeze();
-            camera.fade(250, 0, 0, 0);
-            camera.once('camerafadeoutcomplete', () => {
-                this.scene.launch(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
-                this.scene.sleep();
-                this.playerInDungeon = true;
-                music.pause();
-            });
-        })
-        // add tileIndex callback
         this.enters.setTileIndexCallback(TILES.DUNG_ENTER2, () => {
             this.enters.setTileIndexCallback(TILES.DUNG_ENTER, null);
             this.player.freeze();
             camera.fade(250, 0, 0, 0);
             camera.once('camerafadeoutcomplete', () => {
-                this.scene.launch(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
-                this.scene.sleep();
+                if (this.scene.isSleeping(scenesKeys.scenes.DUNGEON)) {
+                    this.scene.wake(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
+                } else {
+                    this.scene.launch(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
+                }
+                this.scene.switch(scenesKeys.scenes.DUNGEON);
                 this.playerInDungeon = true;
                 music.pause();
             });

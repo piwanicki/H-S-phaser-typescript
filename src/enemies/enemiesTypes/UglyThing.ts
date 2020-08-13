@@ -36,6 +36,7 @@ export default class UglyThing extends Enemy {
             player.sprite.body.center.y,
             this.speed
         );
+
         this.hpBar.x = this.body.position.x;
         this.hpBar.y = this.body.position.y;
         this.hpBar.update(time, delta);

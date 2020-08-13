@@ -22,7 +22,7 @@ export default class Player {
   damageTime = 300;
   dead = false;
   level = 1;
-  exp = 90;
+  exp = 0;
   nextLevelExp = 100 * (this.level * Math.pow(this.level, 2));
 
   constructor(scene, x, y, playerCursorSprite, scale = 1) {
@@ -36,7 +36,7 @@ export default class Player {
     this.mana = 100;
     this.maxMana = this.mana;
     this.playerCursor = new PlayerCursor(this.scene, this.playerCursorSprite);
-
+    this.hpBar = new StatusBar(this.scene, this.x, this.y, this.hp);
     this.hitSound = scene.sound.add("playerHit");
     this.deadSound = scene.sound.add("playerDead");
     this.initPlayer(scene);
@@ -54,12 +54,7 @@ export default class Player {
       .setMaxVelocity(300, 400);
 
     this.missiles = scene.physics.add.group();
-    this.hpBar = new StatusBar(
-      this.scene,
-      this.sprite.x,
-      this.sprite.y,
-      this.hp
-    );
+
     this.sprite.body.moves = true;
     // Track the arrow keys & WASD
     const {LEFT, RIGHT, UP, DOWN, W, S, A, D} = Phaser.Input.Keyboard.KeyCodes;
@@ -80,12 +75,6 @@ export default class Player {
     this.missiles = this.scene.physics.add.group({
       classType: MissileContainer,
     });
-
-    this.scene.physics.add.overlap(
-      this.missiles,
-      this.scene.trees,
-      this.hitWithMissile
-    );
 
     this.sprite.body.moves = true;
     eventsCenter.emit("UI_update", this);
