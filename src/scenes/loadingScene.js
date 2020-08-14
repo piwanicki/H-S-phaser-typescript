@@ -24,12 +24,7 @@ export class LoadingScene extends Phaser.Scene {
     );
 
     this.load.image("menuBackground", "assets/images/menu_background.png");
-    //this.load.image("gameNameLogo", "assets/images/menu_gameLogo.png");
     this.load.image("menuHoverPointer", "assets/images/menu_hoverPointer.png");
-
-    // buttons
-    // this.load.image('startBtn', 'assets/images/menu_background.png');
-    // this.load.image('optionsBtn', 'assets/images/menu_background.png');
 
     // audio
     //this.load.audio('menuTheme', 'assets/audio/menu_theme.mp3');
@@ -79,41 +74,17 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image("tree2", "assets/images/trees/tree_2_lightred.png");
     this.load.image("stone", "assets/images/stone.png");
     this.load.tilemapTiledJSON("map1", "assets/tilemaps/Level1.json");
+    this.load.tilemapTiledJSON("firstCamp", "assets/tilemaps/firstCamp.json");
     this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
-    //this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl.png");
-
-    this.load.image(
-      "waterEdge-left",
-      "assets/images/waters/deep_water_wave_east.png"
-    );
-    this.load.image(
-      "waterEdge-right",
-      "assets/images/waters/deep_water_wave_west.png"
-    );
-    this.load.image(
-      "waterEdge-up",
-      "assets/images/waters/deep_water_wave_north.png"
-    );
-    this.load.image(
-      "waterEdge-down",
-      "assets/images/waters/deep_water_wave_south.png"
-    );
-    this.load.image("statusBar", "assets/images/statusBar.png");
     this.load.image("arrowMissile", "assets/images/player/arrow.png");
-
     // loading dungeon scene preload()
-    this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
     this.load.image(
       "dungeonTileset",
       "assets/tilemaps/Dungeon_Tileset_extruded.png"
     );
     this.load.image("dungeon2", "assets/tilemaps/dungeon_extruder.png");
-    // this.load.spritesheet("player", "assets/images/player/deep_elf_male.png", {
-    //   frameWidth: 32,
-    //   frameHeight: 32,
-    //   margin: 0,
-    //   spacing: 0,
-    // });
+    this.load.image("forest", "assets/tilemaps/ForestTileset_extruded.png");
+    this.load.image("graveyard", "assets/tilemaps/TilesetGraveyard.png");
 
     this.load.spritesheet(
       "player",
@@ -189,7 +160,7 @@ export class LoadingScene extends Phaser.Scene {
     });
 
     this.load.on("complete", () => {
-      this.scene.start(scenesKeys.scenes.MENU);
+      this.scene.start(scenesKeys.scenes.CAMP_1);
       //this.scene.start(scenesKeys.scenes.DUNGEON);
     });
   }

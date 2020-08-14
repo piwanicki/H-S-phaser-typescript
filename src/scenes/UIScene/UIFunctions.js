@@ -12,3 +12,12 @@ export const createFloatingText = (scene, x, y, message, tint, font) => {
     callbackScope: this,
   });
 };
+
+
+export const prepareSpriteFromTile = (layer, tile, tileKey, sizeX, sizeY, offstetX, offsetY) => {
+  layer.removeTileAt(tile.x, tile.y);
+  const x = tile.getCenterX();
+  const y = tile.getCenterY();
+  const waterEdge = this.waterEdges?.create(x, y, tileKey)
+  waterEdge.body.setSize(sizeX, sizeY).setOffset(offstetX, offsetY);
+}
