@@ -71,7 +71,7 @@ export class LoadingScene extends Phaser.Scene {
 
     // loading city scene preload() {
 
-    this.load.tilemapTiledJSON("map1", "assets/tilemaps/Level1.json");
+    //this.load.tilemapTiledJSON("map1", "assets/tilemaps/Level1.json");
     this.load.tilemapTiledJSON("camp1", "assets/tilemaps/Camp1.json");
     this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
     this.load.image("arrowMissile", "assets/images/player/arrow.png");
@@ -96,6 +96,7 @@ export class LoadingScene extends Phaser.Scene {
       }
     );
 
+    /*
     this.load.spritesheet(
       "player-warrior",
       "assets/images/player/warrior_spritesheet.png",
@@ -117,6 +118,7 @@ export class LoadingScene extends Phaser.Scene {
         spacing: 0,
       }
     );
+    */
 
     // tentacle
     this.load.spritesheet("tentacle", "assets/images/enemies/tentacle.png", {
@@ -147,7 +149,7 @@ export class LoadingScene extends Phaser.Scene {
       spacing: 0,
     });
 
-    this.load.image("blood", "assets/images/player/blood.png");
+    //this.load.image("blood", "assets/images/player/blood.png");
 
     this.load.on("progress", (percent) => {
       loadingBar.fillRect(

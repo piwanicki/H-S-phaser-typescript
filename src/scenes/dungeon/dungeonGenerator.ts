@@ -5,7 +5,6 @@ import EnemyGroup from "../../enemies/EnemyGroup";
 // imports Enemies classes
 import Tentacle from "../../enemies/enemiesTypes/Tentacle";
 import UglyThing from "../../enemies/enemiesTypes/UglyThing";
-import { animsKeys } from '~/anims/animsKeys';
 
 export default class DungeonMap {
   private dungeon!: Dungeon;
@@ -230,10 +229,10 @@ export default class DungeonMap {
         x = Phaser.Math.Between(room.left + 2, room.right - 2);
         y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
         miscLayer.putTileAt(TILES.COLUMN.TOP1, x, y)
-        miscLayer.putTileAt(TILES.COLUMN.DOWN1, x, y - 1)
+        miscLayer.putTileAt(TILES.COLUMN.DOWN1, x, y + 1)
 
         miscLayer.putTileAt(TILES.COLUMN.TOP2, x + 3, y)
-        miscLayer.putTileAt(TILES.COLUMN.DOWN2, x + 3, y - 1)
+        miscLayer.putTileAt(TILES.COLUMN.DOWN2, x + 3, y + 1)
 
         this.createTentacle(
           roomCenterOnWorldMap.x + 50,
@@ -278,7 +277,7 @@ export default class DungeonMap {
           );
           this.createTentacle(
             roomCenterOnWorldMap.x,
-            roomCenterOnWorldMap.y - 100
+            roomCenterOnWorldMap.y - 20
           );
           this.createUglyThing(
             roomCenterOnWorldMap.x,

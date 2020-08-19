@@ -127,7 +127,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
   private takeDamage(dmg: number) {
     this.hp -= dmg;
     this.hpBar.decrease(dmg);
-    if (this.hp > 0) createFloatingText(this.scene, this.x - 8, this.y - 30, dmg, 0xFFFFFF, null);
+    if (this.hp > 0) createFloatingText(this.scene, this.x - 8, this.y - 30, dmg, 0xFFFFFF, 12);
     if (this.hp <= 0 && !this.dead) {
       this.body['moves'] = false;
       this.body.onOverlap = false;

@@ -60,6 +60,8 @@ export default class DungeonScene extends Phaser.Scene {
   // }
 
   create() {
+    let music = this.sound.add("dungeonTheme");
+    music.play();
     this.events.on("wake", this.onWake, this);
     //this.events.on("sleep", this.onSleep, this);
 
@@ -68,9 +70,6 @@ export default class DungeonScene extends Phaser.Scene {
     createPlayerAnims(this.anims);
     createTentacleAnims(this.anims);
     createUglyThingAnims(this.anims);
-
-    let music = this.sound.add("dungeonTheme");
-    music.play();
 
     // Create a blank tilemap with dimensions matching the dungeon
     this.tilemap = this.make.tilemap({

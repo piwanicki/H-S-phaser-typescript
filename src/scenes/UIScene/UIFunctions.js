@@ -1,6 +1,6 @@
-export const createFloatingText = (scene, x, y, message, tint, font) => {
+export const createFloatingText = (scene, x, y, message, tint,fontSize, font) => {
   //let animation =scene.add.bitmapText(x, y, font, message).setTint(tint);
-  let animation = scene.add.text(x, y, message, {fontSize: 12}).setTint(tint);
+  let animation = scene.add.text(x, y, message, {fontSize: fontSize}).setTint(tint);
   let tween = scene.add.tween({
     targets: animation,
     duration: 750,

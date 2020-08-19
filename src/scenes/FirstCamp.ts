@@ -164,10 +164,10 @@ export default class FirstCamp extends Phaser.Scene {
             camera.once('camerafadeoutcomplete', () => {
                 if (this.scene.isSleeping(scenesKeys.scenes.DUNGEON)) {
                     this.scene.wake(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
+                    this.scene.switch(scenesKeys.scenes.DUNGEON);
                 } else {
-                    this.scene.launch(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
+                    this.scene.start(scenesKeys.scenes.DUNGEON, { PLAYER: this.player });
                 }
-                this.scene.switch(scenesKeys.scenes.DUNGEON);
                 this.playerInDungeon = true;
                 music.pause();
             });

@@ -65,7 +65,7 @@ export default class MenuScene extends Phaser.Scene {
       this.cameras.main.fade(250, 0, 0, 0);
       this.cameras.main.once("camerafadeoutcomplete", () => {
         this.scene.launch(scenesKeys.scenes.GAME_UI);
-        this.scene.start(scenesKeys.scenes.CITY);
+        this.scene.start(scenesKeys.scenes.CAMP_1);
         music.pause();
       });
     });

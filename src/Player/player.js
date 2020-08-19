@@ -16,7 +16,7 @@ export default class Player {
   hitTintDuration = 0;
   missile;
   missiles;
-
+  speed;
   fireRate = 300;
   attack = 12;
   strength = 3;
@@ -28,6 +28,7 @@ export default class Player {
 
   constructor(scene, x, y, playerCursorSprite, scale = 1) {
     this.scene = scene;
+    this.speed = 350;
     this.x = x;
     this.y = y;
     this.playerCursorSprite = playerCursorSprite;
@@ -154,6 +155,14 @@ export default class Player {
 
   updatePlayerExp = (exp) => {
     this.exp += exp;
+    createFloatingText(
+      this.scene,
+      this.sprite.body.x - 10,
+      this.sprite.body.center.y - 20,
+      `+ ${exp} EXP`,
+      0xfce250,
+      9
+    );
     if (this.exp >= this.nextLevelExp) {
       this.level++;
       this.nextLevelExp = 100 * Math.pow(this.level, 2);
@@ -183,7 +192,7 @@ export default class Player {
       return;
     }
 
-    const spriteSpeed = 750;
+    const spriteSpeed = this.speed;
     const scene = this.scene;
 
     //reset TinCollor

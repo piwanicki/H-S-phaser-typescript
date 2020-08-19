@@ -18,7 +18,7 @@ const config: Phaser.Types.Core.GameConfig = {
 		}
 	},
 	scene: [LoadingScene, MenuScene, FirstCamp, DungeonScene, GameUI],
-	//scene: [DungeonScene],
+	//scene: [LoadingScene,DungeonScene],
 	scale: {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH
