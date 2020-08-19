@@ -77,10 +77,12 @@ export default class DungeonMap {
     return this.dungeon;
   }
 
+
   private generateMap = () => {
 
     const wallsLayer = this.scene["wallsLayer"];
     const stuffLayer = this.scene["stuffLayer"];
+    const miscLayer = this.scene["miscLayer"];
     const map = this.scene["tilemap"];
     const player = this.scene["player"];
     this.renderDungeon();
@@ -163,6 +165,9 @@ export default class DungeonMap {
         room.centerX,
         room.centerY
       );
+
+      const { x, y, width, height, left, right, top, bottom } = room;
+
       if (rand <= 0.05) {
         // 5% chance of HP
         stuffLayer.putTileAt(TILES.HP, room.centerX, room.centerY);
@@ -178,6 +183,10 @@ export default class DungeonMap {
           roomCenterOnWorldMap.x + 90,
           roomCenterOnWorldMap.y + 10
         );
+
+        const skullX = Phaser.Math.Between(left + 2, right - 2);
+        const skullY = Phaser.Math.Between(top + 2, bottom - 2);
+        miscLayer.putTileAt(TILES.BONES.SKULL, skullX, skullY)
       } else if (rand <= 0.1) {
         // 10% chance of Mana
         stuffLayer.putTileAt(TILES.MANA, room.centerX, room.centerY);
@@ -187,8 +196,11 @@ export default class DungeonMap {
         );
         this.createUglyThing(
           roomCenterOnWorldMap.x + 80,
-          roomCenterOnWorldMap.y + 80
+          roomCenterOnWorldMap.y + 8
         );
+        const boneX = Phaser.Math.Between(left + 2, right - 2);
+        const boneY = Phaser.Math.Between(top + 2, bottom - 2);
+        miscLayer.putTileAt(TILES.BONES.BONES, boneX, boneY)
       } else if (rand <= 0.25) {
         // 25% chance of chest
         stuffLayer.putTileAt(TILES.CHEST, room.centerX, room.centerY);
@@ -198,17 +210,31 @@ export default class DungeonMap {
         );
         this.createTentacle(
           roomCenterOnWorldMap.x - 50,
-          roomCenterOnWorldMap.y + 50
+          roomCenterOnWorldMap.y + 5
         );
         this.createUglyThing(
           roomCenterOnWorldMap.x + 100,
           roomCenterOnWorldMap.y + 80
         );
+        const boneX = Phaser.Math.Between(left + 2, right - 2);
+        const boneY = Phaser.Math.Between(top + 2, bottom - 2);
+        miscLayer.putTileAt(TILES.BONES.BONES, boneX, boneY)
+        const skullX = Phaser.Math.Between(left + 2, right - 2);
+        const skullY = Phaser.Math.Between(top + 2, bottom - 2);
+        miscLayer.putTileAt(TILES.BONES.SKULL, skullX, skullY)
       } else if (rand <= 0.5) {
         // 50% chance of a pot anywhere in the room... except don't block a door!
-        const x = Phaser.Math.Between(room.left + 2, room.right - 2);
-        const y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
+        let x = Phaser.Math.Between(room.left + 2, room.right - 2);
+        let y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
         stuffLayer.putTileAt(TILES.PENTAGRAM, x, y);
+        x = Phaser.Math.Between(room.left + 2, room.right - 2);
+        y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
+        miscLayer.putTileAt(TILES.COLUMN.TOP1, x, y)
+        miscLayer.putTileAt(TILES.COLUMN.DOWN1, x, y - 1)
+
+        miscLayer.putTileAt(TILES.COLUMN.TOP2, x + 3, y)
+        miscLayer.putTileAt(TILES.COLUMN.DOWN2, x + 3, y - 1)
+
         this.createTentacle(
           roomCenterOnWorldMap.x + 50,
           roomCenterOnWorldMap.y + 50
@@ -217,6 +243,11 @@ export default class DungeonMap {
           roomCenterOnWorldMap.x + 100,
           roomCenterOnWorldMap.y + 80
         );
+
+        const boneX = Phaser.Math.Between(left + 2, right - 2);
+        const boneY = Phaser.Math.Between(top + 2, bottom - 2);
+        miscLayer.putTileAt(TILES.BONES.BONES, boneX, boneY)
+
       } else {
         // 25% of either 2 or 4 towers, depending on the room size
         if (room.height >= 9) {
@@ -287,6 +318,8 @@ export default class DungeonMap {
 
     const groundLayer = this.scene["groundLayer"];
     const wallsLayer = this.scene["wallsLayer"];
+    const miscLayer = this.scene["miscLayer"];
+
 
     this.dungeon.rooms.forEach((room) => {
       // destructuring
@@ -314,6 +347,18 @@ export default class DungeonMap {
       wallsLayer.fill(TILES.WALL.BOTTOM, left + 1, bottom, width - 2, 1);
       wallsLayer.fill(TILES.WALL.LEFT, left, top + 2, 1, height - 3);
       wallsLayer.fill(TILES.WALL.RIGHT, right, top + 2, 1, height - 3);
+
+      // add misc at walls / skulls on the floor
+      const vine1Pos = Phaser.Math.Between(left + 1, right - 1);
+      miscLayer.putTileAt(TILES.VINES.TOP1, vine1Pos, top)
+      miscLayer.putTileAt(TILES.VINES.DOWN1, vine1Pos, top + 1)
+      const vine2Pos = Phaser.Math.Between(left + 1, right - 1);
+      miscLayer.putTileAt(TILES.VINES.TOP2, vine2Pos, top)
+      miscLayer.putTileAt(TILES.VINES.DOWN2, vine2Pos, top + 1)
+
+
+
+
 
       // add doors
       // Dungeons have rooms that are connected with doors. Each door has an x & y relative to the

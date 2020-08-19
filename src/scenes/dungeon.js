@@ -70,7 +70,7 @@ export default class DungeonScene extends Phaser.Scene {
     createUglyThingAnims(this.anims);
 
     let music = this.sound.add("dungeonTheme");
-    //music.play();
+    music.play();
 
     // Create a blank tilemap with dimensions matching the dungeon
     this.tilemap = this.make.tilemap({
@@ -102,6 +102,10 @@ export default class DungeonScene extends Phaser.Scene {
     );
     this.wallsLayer = this.tilemap.createBlankDynamicLayer(
       "wallsLayer",
+      dungeonTileset
+    );
+    this.miscLayer = this.tilemap.createBlankDynamicLayer(
+      "miscLayer",
       dungeonTileset
     );
     this.tilesetStuff = this.tilemap.addTilesetImage(
@@ -201,8 +205,8 @@ export default class DungeonScene extends Phaser.Scene {
           camera.once("camerafadeoutcomplete", () => {
             //.player.destroy();
             music.pause();
-            this.scene.wake(scenesKeys.scenes.CITY, {PLAYER: this.player});
-            this.scene.switch(scenesKeys.scenes.CITY);
+            this.scene.wake(scenesKeys.scenes.CAMP_1, {PLAYER: this.player});
+            this.scene.switch(scenesKeys.scenes.CAMP_1);
           });
         } else {
           this.stuffLayer.setTileIndexCallback(TILES.STAIRS_DOWN, null);

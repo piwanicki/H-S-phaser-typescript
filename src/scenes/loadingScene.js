@@ -70,11 +70,9 @@ export class LoadingScene extends Phaser.Scene {
     // }
 
     // loading city scene preload() {
-    this.load.image("tree1", "assets/images/trees/mangrove_2.png");
-    this.load.image("tree2", "assets/images/trees/tree_2_lightred.png");
-    this.load.image("stone", "assets/images/stone.png");
+
     this.load.tilemapTiledJSON("map1", "assets/tilemaps/Level1.json");
-    this.load.tilemapTiledJSON("firstCamp", "assets/tilemaps/firstCamp.json");
+    this.load.tilemapTiledJSON("camp1", "assets/tilemaps/Camp1.json");
     this.load.image("dungeonSet", "assets/tilemaps/DungeonCrawl_extruder.png");
     this.load.image("arrowMissile", "assets/images/player/arrow.png");
     // loading dungeon scene preload()
@@ -83,7 +81,8 @@ export class LoadingScene extends Phaser.Scene {
       "assets/tilemaps/Dungeon_Tileset_extruded.png"
     );
     this.load.image("dungeon2", "assets/tilemaps/dungeon_extruder.png");
-    this.load.image("forest", "assets/tilemaps/ForestTileset_extruded.png");
+    this.load.image("forest", "assets/tilemaps/forestground06dv5-extruded.png");
+    this.load.image("mountain", "assets/tilemaps/mountain_landscape.png");
     this.load.image("graveyard", "assets/tilemaps/TilesetGraveyard.png");
 
     this.load.spritesheet(
@@ -160,7 +159,7 @@ export class LoadingScene extends Phaser.Scene {
     });
 
     this.load.on("complete", () => {
-      this.scene.start(scenesKeys.scenes.CAMP_1);
+      this.scene.start(scenesKeys.scenes.MENU);
       //this.scene.start(scenesKeys.scenes.DUNGEON);
     });
   }

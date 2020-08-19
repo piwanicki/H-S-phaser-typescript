@@ -22,7 +22,7 @@ export default class MenuScene extends Phaser.Scene {
 
     let music = this.sound.add("menuTheme2");
     this.sound.pauseOnBlur = false;
-    //music.play();
+    music.play();
 
     this.add.bitmapText(
       this.game.renderer.width / 3,

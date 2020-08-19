@@ -47,6 +47,27 @@ const TILE_MAPPING = {
     RIGHT_TOP_1: 82,
   },
 
+  VINES: {
+    TOP1: 256,
+    DOWN1: 272,
+    TOP2: 257,
+    DOWN2: 273,
+  },
+
+  COLUMN: {
+    TOP1: 208,
+    DOWN1: 224,
+    TOP2: 209,
+    DOWN2: 225,
+    TOP3: 210,
+    DOWN3: 226,
+  },
+
+  BONES: {
+    SKULL: 240,
+    BONES: 241,
+  },
+
   // dungeonSet tileset
   CHEST: 2923,
   STAIRS_DOWN: 1001,
@@ -63,10 +84,14 @@ const TILE_MAPPING = {
     {index: 647, weight: 4},
   ],
   PENTAGRAM: 2876,
-  DUNG_ENTER: 2873,
-  DUNG_ENTER2: 2885,
+  DUNG_ENTER: 3585,
+  DUNG_ENTER2: 3597,
   BLOOD: 3,
   GREEN_BLOOD: 2,
+
+  // forest tileset
+  CAVE_ENTER: 206,
+  CAVE_ENTER2: 207,
 };
 
 export default TILE_MAPPING;

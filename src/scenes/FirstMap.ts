@@ -207,7 +207,8 @@ export default class FirstMap extends Phaser.Scene {
         //     .setScrollFactor(0);
 
         // add tileIndex callback
-        this.enters.setTileIndexCallback(TILES.DUNG_ENTER2, () => {
+        this.enters.setTileIndexCallback(TILES.DUNG_ENTER, () => {
+
             this.enters.setTileIndexCallback(TILES.DUNG_ENTER, null);
             this.player.freeze();
             camera.fade(250, 0, 0, 0);
